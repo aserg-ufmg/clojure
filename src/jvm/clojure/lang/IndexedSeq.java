@@ -10,6 +10,8 @@
 
 package clojure.lang;
 
+import clojure.lang.interfaces.ISeq;
+
 public interface IndexedSeq extends ISeq, Sequential, Counted{
 
 public int index();

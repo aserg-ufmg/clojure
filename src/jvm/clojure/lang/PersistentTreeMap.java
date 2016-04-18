@@ -14,6 +14,9 @@ package clojure.lang;
 
 import java.util.*;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 /**
  * Persistent Red Black Tree
  * Note that instances of this class are constant values
@@ -22,7 +25,7 @@ import java.util.*;
  * See Okasaki, Kahrs, Larsen et al
  */
 
-public class PersistentTreeMap extends APersistentMap implements IObj, Reversible, Sorted, IKVReduce{
+public class PersistentTreeMap extends APersistentMap implements IClojureObject, Reversible, Sorted, IKVReduce{
 
 public final Comparator comp;
 public final Node tree;
@@ -101,7 +104,7 @@ public PersistentTreeMap assocEx(Object key, Object val) {
 		{
 		throw Util.runtimeException("Key already present");
 		}
-	return new PersistentTreeMap(comp, t.blacken(), _count + 1, meta());
+	return new PersistentTreeMap(comp, t.blacken(), _count + 1, getMeta());
 }
 
 public PersistentTreeMap assoc(Object key, Object val){
@@ -112,9 +115,9 @@ public PersistentTreeMap assoc(Object key, Object val){
 		Node foundNode = (Node) found.val;
 		if(foundNode.val() == val)  //note only get same collection on identity of val, not equals()
 			return this;
-		return new PersistentTreeMap(comp, replace(tree, key, val), _count, meta());
+		return new PersistentTreeMap(comp, replace(tree, key, val), _count, getMeta());
 		}
-	return new PersistentTreeMap(comp, t.blacken(), _count + 1, meta());
+	return new PersistentTreeMap(comp, t.blacken(), _count + 1, getMeta());
 }
 
 
@@ -126,9 +129,9 @@ public PersistentTreeMap without(Object key){
 		if(found.val == null)//null == doesn't contain key
 			return this;
 		//empty
-		return new PersistentTreeMap(meta(), comp);
+		return new PersistentTreeMap(getMeta(), comp);
 		}
-	return new PersistentTreeMap(comp, t.blacken(), _count - 1, meta());
+	return new PersistentTreeMap(comp, t.blacken(), _count - 1, getMeta());
 }
 
 public ISeq seq(){
@@ -138,7 +141,7 @@ public ISeq seq(){
 }
 
 public IPersistentCollection empty(){
-	return new PersistentTreeMap(meta(), comp);	
+	return new PersistentTreeMap(getMeta(), comp);	
 }
 
 public ISeq rseq() {
@@ -481,7 +484,7 @@ static Black black(Object key, Object val, Node left, Node right){
 	return new BlackBranchVal(key, val, left, right);
 }
 
-public IPersistentMap meta(){
+public IPersistentMap getMeta(){
 	return _meta;
 }
 
@@ -828,7 +831,7 @@ static public class Seq extends ASeq{
 		return cnt;
 	}
 
-	public Obj withMeta(IPersistentMap meta){
+	public ClojureObject withMeta(IPersistentMap meta){
 		return new Seq(meta, stack, asc, cnt);
 	}
 }

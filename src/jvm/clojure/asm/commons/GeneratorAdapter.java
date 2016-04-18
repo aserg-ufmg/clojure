@@ -725,7 +725,7 @@ public class GeneratorAdapter extends LocalVariablesSorter {
     /**
      * Generates a POP2 instruction.
      */
-    public void pop2() {
+    public void popLongDouble() {
         mv.visitInsn(Opcodes.POP2);
     }
 
@@ -797,10 +797,10 @@ public class GeneratorAdapter extends LocalVariablesSorter {
         } else {
             if (prev.getSize() == 1) {
                 dup2X1();
-                pop2();
+                popLongDouble();
             } else {
                 dup2X2();
-                pop2();
+                popLongDouble();
             }
         }
     }

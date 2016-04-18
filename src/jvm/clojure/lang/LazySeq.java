@@ -14,7 +14,10 @@ package clojure.lang;
 
 import java.util.*;
 
-public final class LazySeq extends Obj implements ISeq, Sequential, List, IPending, IHashEq{
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
+public final class LazySeq extends ClojureObject implements ISeq, Sequential, List, IPending, IHashEq{
 
 private IFn fn;
 private Object sv;
@@ -30,7 +33,7 @@ private LazySeq(IPersistentMap meta, ISeq s){
 	this.s = s;
 }
 
-public Obj withMeta(IPersistentMap meta){
+public ClojureObject withMeta(IPersistentMap meta){
 	return new LazySeq(meta, seq());
 }
 
@@ -96,10 +99,10 @@ public IPersistentCollection empty(){
 	return PersistentList.EMPTY;
 }
 
-public boolean equiv(Object o){
+public boolean isEquivalent(Object o){
 	ISeq s = seq();
 	if(s != null)
-		return s.equiv(o);
+		return s.isEquivalent(o);
 	else
 		return (o instanceof Sequential || o instanceof List) && RT.seq(o) == null;
 }
@@ -188,13 +191,8 @@ public Iterator iterator(){
 	return new SeqIterator(this);
 }
 
-//////////// List stuff /////////////////
-private List reify(){
-	return new ArrayList(this);
-}
-
 public List subList(int fromIndex, int toIndex){
-	return reify().subList(fromIndex, toIndex);
+	return new ArrayList(this).subList(fromIndex, toIndex);
 }
 
 public Object set(int index, Object element){
@@ -216,15 +214,15 @@ public int indexOf(Object o){
 }
 
 public int lastIndexOf(Object o){
-	return reify().lastIndexOf(o);
+	return new ArrayList(this).lastIndexOf(o);
 }
 
 public ListIterator listIterator(){
-	return reify().listIterator();
+	return new ArrayList(this).listIterator();
 }
 
 public ListIterator listIterator(int index){
-	return reify().listIterator(index);
+	return new ArrayList(this).listIterator(index);
 }
 
 public Object get(int index){

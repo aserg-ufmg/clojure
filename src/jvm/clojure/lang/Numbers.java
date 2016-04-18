@@ -16,6 +16,8 @@ import java.math.BigInteger;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
+import clojure.lang.interfaces.ISeq;
+
 public class Numbers{
 
 static interface Ops{
@@ -243,21 +245,21 @@ static public int compare(Number x, Number y){
 }
 
 @WarnBoxedMath(false)
-static BigInt toBigInt(Object x){
-	if(x instanceof BigInt)
-		return (BigInt) x;
+static ClojureBigInteger toBigInt(Object x){
+	if(x instanceof ClojureBigInteger)
+		return (ClojureBigInteger) x;
 	if(x instanceof BigInteger)
-		return BigInt.fromBigInteger((BigInteger) x);
+		return ClojureBigInteger.fromBigInteger((BigInteger) x);
 	else
-		return BigInt.fromLong(((Number) x).longValue());
+		return ClojureBigInteger.fromLong(((Number) x).longValue());
 }
 
 @WarnBoxedMath(false)
 static BigInteger toBigInteger(Object x){
 	if(x instanceof BigInteger)
 		return (BigInteger) x;
-	else if(x instanceof BigInt)
-		return ((BigInt) x).toBigInteger();	
+	else if(x instanceof ClojureBigInteger)
+		return ((ClojureBigInteger) x).toBigInteger();	
 	else
 		return BigInteger.valueOf(((Number) x).longValue());
 }
@@ -266,9 +268,9 @@ static BigInteger toBigInteger(Object x){
 static BigDecimal toBigDecimal(Object x){
 	if(x instanceof BigDecimal)
 		return (BigDecimal) x;
-	else if(x instanceof BigInt)
+	else if(x instanceof ClojureBigInteger)
 		{
-		BigInt bi = (BigInt) x;
+		ClojureBigInteger bi = (ClojureBigInteger) x;
 		if(bi.bipart == null)
 			return BigDecimal.valueOf(bi.lpart);
 		else
@@ -316,7 +318,7 @@ static public Number rationalize(Number x){
 		BigInteger bv = bx.unscaledValue();
 		int scale = bx.scale();
 		if(scale < 0)
-			return BigInt.fromBigInteger(bv.multiply(BigInteger.TEN.pow(-scale)));
+			return ClojureBigInteger.fromBigInteger(bv.multiply(BigInteger.TEN.pow(-scale)));
 		else
 			return divide(bv, BigInteger.TEN.pow(scale));
 		}
@@ -339,26 +341,18 @@ static public Number rationalize(Number x){
 //		return Double.valueOf((double) val);
 //}
 
-@WarnBoxedMath(false)
-static public Number reduceBigInt(BigInt val){
-	if(val.bipart == null)
-		return num(val.lpart);
-	else
-		return val.bipart;
-}
-
 static public Number divide(BigInteger n, BigInteger d){
 	if(d.equals(BigInteger.ZERO))
 		throw new ArithmeticException("Divide by zero");
 	BigInteger gcd = n.gcd(d);
 	if(gcd.equals(BigInteger.ZERO))
-		return BigInt.ZERO;
+		return ClojureBigInteger.ZERO;
 	n = n.divide(gcd);
 	d = d.divide(gcd);
 	if(d.equals(BigInteger.ONE))
-		return BigInt.fromBigInteger(n);
+		return ClojureBigInteger.fromBigInteger(n);
 	else if(d.equals(BigInteger.ONE.negate()))
-		return BigInt.fromBigInteger(n.negate());
+		return ClojureBigInteger.fromBigInteger(n.negate());
 	return new Ratio((d.signum() < 0 ? n.negate() : n),
 	                 (d.signum() < 0 ? d.negate() : d));
 }
@@ -539,7 +533,7 @@ final static class LongOps implements Ops{
 		long val = x.longValue();
 		if(val > Long.MIN_VALUE)
 			return num(-val);
-		return BigInt.fromBigInteger(BigInteger.valueOf(val).negate());
+		return ClojureBigInteger.fromBigInteger(BigInteger.valueOf(val).negate());
 	}
 	public Number inc(Number x){
 		long val = x.longValue();
@@ -731,7 +725,7 @@ final static class RatioOps extends OpsP{
 		Ratio ry = toRatio(y);
 		BigInteger q = rx.numerator.multiply(ry.denominator).divide(
 				rx.denominator.multiply(ry.numerator));
-		return normalizeRet(BigInt.fromBigInteger(q), x, y);
+		return normalizeRet(ClojureBigInteger.fromBigInteger(q), x, y);
 	}
 
 	public Number remainder(Number x, Number y){
@@ -810,21 +804,21 @@ final static class BigIntOps extends OpsP{
 	}
 
 	public boolean isZero(Number x){
-		BigInt bx = toBigInt(x);
+		ClojureBigInteger bx = toBigInt(x);
 		if(bx.bipart == null)
 			return bx.lpart == 0;
 		return bx.bipart.signum() == 0;
 	}
 
 	public boolean isPos(Number x){
-		BigInt bx = toBigInt(x);
+		ClojureBigInteger bx = toBigInt(x);
 		if(bx.bipart == null)
 			return bx.lpart > 0;
 		return bx.bipart.signum() > 0;
 	}
 
 	public boolean isNeg(Number x){
-		BigInt bx = toBigInt(x);
+		ClojureBigInteger bx = toBigInt(x);
 		if(bx.bipart == null)
 			return bx.lpart < 0;
 		return bx.bipart.signum() < 0;
@@ -868,23 +862,23 @@ final static class BigIntOps extends OpsP{
 
 	//public Number subtract(Number x, Number y);
 	final public Number negate(Number x){
-		return BigInt.fromBigInteger(toBigInteger(x).negate());
+		return ClojureBigInteger.fromBigInteger(toBigInteger(x).negate());
 	}
 
 	public Number inc(Number x){
 		BigInteger bx = toBigInteger(x);
-		return BigInt.fromBigInteger(bx.add(BigInteger.ONE));
+		return ClojureBigInteger.fromBigInteger(bx.add(BigInteger.ONE));
 	}
 
 	public Number dec(Number x){
 		BigInteger bx = toBigInteger(x);
-		return BigInt.fromBigInteger(bx.subtract(BigInteger.ONE));
+		return ClojureBigInteger.fromBigInteger(bx.subtract(BigInteger.ONE));
 	}
 }
 
 
 final static class BigDecimalOps extends OpsP{
-	final static Var MATH_CONTEXT = RT.MATH_CONTEXT;
+	final static Variable MATH_CONTEXT = RT.MATH_CONTEXT;
 
 	public Ops combine(Ops y){
 		return y.opsWith(this);
@@ -1020,7 +1014,7 @@ static Ops ops(Object x){
 		return LONG_OPS;
 	else if(xc == Float.class)
 		return DOUBLE_OPS;
-	else if(xc == BigInt.class)
+	else if(xc == ClojureBigInteger.class)
 		return BIGINT_OPS;
 	else if(xc == BigInteger.class)
 		return BIGINT_OPS;
@@ -1075,7 +1069,7 @@ static Category category(Object x){
 		return Category.INTEGER;
 	else if(xc == Float.class)
 		return Category.FLOATING;
-	else if(xc == BigInt.class)
+	else if(xc == ClojureBigInteger.class)
 		return Category.INTEGER;
 	else if(xc == Ratio.class)
 		return Category.RATIO;
@@ -1830,7 +1824,7 @@ static public long minus(long x){
 
 static public Number minusP(long x){
 	if(x == Long.MIN_VALUE)
-		return BigInt.fromBigInteger(BigInteger.valueOf(x).negate());
+		return ClojureBigInteger.fromBigInteger(BigInteger.valueOf(x).negate());
 	return num(-x);
 }
 

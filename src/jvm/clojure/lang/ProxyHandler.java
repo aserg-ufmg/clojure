@@ -15,6 +15,8 @@ package clojure.lang;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
+import clojure.lang.interfaces.IFn;
+
 public class ProxyHandler implements InvocationHandler{
 //method-name-string->fn
 final IPersistentMap fns;

@@ -13,6 +13,9 @@ package clojure.lang;
 import java.io.Serializable;
 import java.util.*;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 public class PersistentList extends ASeq implements IPersistentList, IReduce, List, Counted {
 
 private final Object _first;
@@ -54,11 +57,11 @@ static public class Primordial extends RestFn{
 		return create(list);
 	}
 
-	public IObj withMeta(IPersistentMap meta){
+	public IClojureObject withMeta(IPersistentMap meta){
 		throw new UnsupportedOperationException();
 	}
 
-	public IPersistentMap meta(){
+	public IPersistentMap getMeta(){
 		return null;
 	}
 }
@@ -115,11 +118,11 @@ public int count(){
 }
 
 public PersistentList cons(Object o){
-	return new PersistentList(meta(), o, this, _count + 1);
+	return new PersistentList(getMeta(), o, this, _count + 1);
 }
 
 public IPersistentCollection empty(){
-	return EMPTY.withMeta(meta());
+	return EMPTY.withMeta(getMeta());
 }
 
 public PersistentList withMeta(IPersistentMap meta){
@@ -148,7 +151,7 @@ public Object reduce(IFn f, Object start) {
 }
 
 
-    static class EmptyList extends Obj implements IPersistentList, List, ISeq, Counted, IHashEq{
+    static class EmptyList extends ClojureObject implements IPersistentList, List, ISeq, Counted, IHashEq{
 	static final int hasheq = Murmur3.hashOrdered(Collections.EMPTY_LIST);
 
 	public int hashCode(){
@@ -167,7 +170,7 @@ public Object reduce(IFn f, Object start) {
         return (o instanceof Sequential || o instanceof List) && RT.seq(o) == null;
     }
 
-	public boolean equiv(Object o){
+	public boolean isEquivalent(Object o){
 		return equals(o);
 	}
 	
@@ -188,7 +191,7 @@ public Object reduce(IFn f, Object start) {
         }
 
         public PersistentList cons(Object o){
-		return new PersistentList(meta(), o, null, 1);
+		return new PersistentList(getMeta(), o, null, 1);
 	}
 
 	public IPersistentCollection empty(){
@@ -196,7 +199,7 @@ public Object reduce(IFn f, Object start) {
 	}
 
 	public EmptyList withMeta(IPersistentMap meta){
-		if(meta != meta())
+		if(meta != getMeta())
 			return new EmptyList(meta);
 		return this;
 	}

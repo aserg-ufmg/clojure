@@ -10,6 +10,9 @@
 
 package clojure.lang;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 /* Alex Miller, Dec 5, 2014 */
 
 public class Cycle extends ASeq implements IReduce, IPending {

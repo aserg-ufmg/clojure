@@ -14,6 +14,9 @@ package clojure.lang;
 
 import java.lang.reflect.Array;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 public class ArraySeq extends ASeq implements IndexedSeq, IReduce{
 public final Object[] array;
 final int i;
@@ -158,7 +161,7 @@ static public class ArraySeq_int extends ASeq implements IndexedSeq, IReduce{
 
 	public ISeq next(){
 		if(i + 1 < array.length)
-			return new ArraySeq_int(meta(), array, i + 1);
+			return new ArraySeq_int(getMeta(), array, i + 1);
 		return null;
 	}
 
@@ -236,7 +239,7 @@ static public class ArraySeq_float extends ASeq implements IndexedSeq, IReduce{
 
 	public ISeq next(){
 		if(i + 1 < array.length)
-			return new ArraySeq_float(meta(), array, i + 1);
+			return new ArraySeq_float(getMeta(), array, i + 1);
 		return null;
 	}
 
@@ -311,7 +314,7 @@ static public class ArraySeq_double extends ASeq implements IndexedSeq, IReduce{
 
 	public ISeq next(){
 		if(i + 1 < array.length)
-			return new ArraySeq_double(meta(), array, i + 1);
+			return new ArraySeq_double(getMeta(), array, i + 1);
 		return null;
 	}
 
@@ -388,7 +391,7 @@ static public class ArraySeq_long extends ASeq implements IndexedSeq, IReduce{
 
 	public ISeq next(){
 		if(i + 1 < array.length)
-			return new ArraySeq_long(meta(), array, i + 1);
+			return new ArraySeq_long(getMeta(), array, i + 1);
 		return null;
 	}
 
@@ -465,7 +468,7 @@ static public class ArraySeq_byte extends ASeq implements IndexedSeq, IReduce{
 
 	public ISeq next(){
 		if(i + 1 < array.length)
-			return new ArraySeq_byte(meta(), array, i + 1);
+			return new ArraySeq_byte(getMeta(), array, i + 1);
 		return null;
 	}
 
@@ -550,7 +553,7 @@ static public class ArraySeq_char extends ASeq implements IndexedSeq, IReduce{
 
 	public ISeq next(){
 		if(i + 1 < array.length)
-			return new ArraySeq_char(meta(), array, i + 1);
+			return new ArraySeq_char(getMeta(), array, i + 1);
 		return null;
 	}
 
@@ -635,7 +638,7 @@ static public class ArraySeq_short extends ASeq implements IndexedSeq, IReduce{
 
 	public ISeq next(){
 		if(i + 1 < array.length)
-			return new ArraySeq_short(meta(), array, i + 1);
+			return new ArraySeq_short(getMeta(), array, i + 1);
 		return null;
 	}
 
@@ -720,7 +723,7 @@ static public class ArraySeq_boolean extends ASeq implements IndexedSeq, IReduce
 
 	public ISeq next(){
 		if(i + 1 < array.length)
-			return new ArraySeq_boolean(meta(), array, i + 1);
+			return new ArraySeq_boolean(getMeta(), array, i + 1);
 		return null;
 	}
 

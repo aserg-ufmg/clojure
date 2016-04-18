@@ -20,4 +20,8 @@ public Reduced(Object val){
 public Object deref(){
 	return val;
 }
+
+Object reset(Object newval) {
+	return null;
+}
 }

@@ -14,6 +14,9 @@ package clojure.lang;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 final public class Atom extends ARef implements IAtom{
 final AtomicReference state;
 

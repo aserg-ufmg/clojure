@@ -13,6 +13,9 @@ package clojure.lang;
 import java.io.Serializable;
 import java.util.*;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 public abstract class APersistentMap extends AFn implements IPersistentMap, Map, Iterable, Serializable, MapEquivalence, IHashEq {
 int _hash = -1;
 int _hasheq = -1;
@@ -70,7 +73,7 @@ static public boolean mapEquals(IPersistentMap m1, Object obj){
 	return true;
 }
 
-public boolean equiv(Object obj){
+public boolean isEquivalent(Object obj){
 	if(!(obj instanceof Map))
 		return false;
 	if(obj instanceof IPersistentMap && !(obj instanceof MapEquivalence))

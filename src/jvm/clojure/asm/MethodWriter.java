@@ -2071,7 +2071,7 @@ class MethodWriter extends MethodVisitor {
                 out.putByteArray(stackMap.data, 0, stackMap.length);
             }
             if (cattrs != null) {
-                cattrs.put(cw, code.data, code.length, maxLocals, maxStack, out);
+                cattrs.writeAllAtributes(cw, code.data, code.length, maxLocals, maxStack, out);
             }
         }
         if (exceptionCount > 0) {
@@ -2117,7 +2117,7 @@ class MethodWriter extends MethodVisitor {
             AnnotationWriter.put(ipanns, synthetics, out);
         }
         if (attrs != null) {
-            attrs.put(cw, null, 0, -1, -1, out);
+            attrs.writeAllAtributes(cw, null, 0, -1, -1, out);
         }
     }
 

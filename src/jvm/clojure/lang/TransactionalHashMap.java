@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.*;
 
 public class TransactionalHashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V>{
-final Ref[] bins;
+final Reference[] bins;
 
 IPersistentMap mapAt(int bin){
 	return (IPersistentMap) bins[bin].deref();
@@ -40,9 +40,9 @@ public TransactionalHashMap() {
 }
 
 public TransactionalHashMap(int nBins) {
-	bins = new Ref[nBins];
+	bins = new Reference[nBins];
 	for(int i = 0; i < nBins; i++)
-		bins[i] = new Ref(PersistentHashMap.EMPTY);
+		bins[i] = new Reference(PersistentHashMap.EMPTY);
 }
 
 public TransactionalHashMap(Map<? extends K, ? extends V> m) {
@@ -75,7 +75,7 @@ public V get(Object k){
 }
 
 public V put(K k, V v){
-	Ref r = bins[binFor(k)];
+	Reference r = bins[binFor(k)];
 	IPersistentMap map = (IPersistentMap) r.deref();
 	Object ret = map.valAt(k);
 	r.set(map.assoc(k, v));
@@ -83,7 +83,7 @@ public V put(K k, V v){
 }
 
 public V remove(Object k){
-	Ref r = bins[binFor(k)];
+	Reference r = bins[binFor(k)];
 	IPersistentMap map = (IPersistentMap) r.deref();
 	Object ret = map.valAt(k);
 	r.set(map.without(k));
@@ -101,7 +101,7 @@ public void putAll(Map<? extends K, ? extends V> map){
 public void clear(){
 	for(int i = 0; i < bins.length; i++)
 		{
-		Ref r = bins[i];
+		Reference r = bins[i];
 		IPersistentMap map = (IPersistentMap) r.deref();
 		if(map.count() > 0)
 			{
@@ -130,7 +130,7 @@ public Set<Entry<K, V>> entrySet(){
 }
 
 public V putIfAbsent(K k, V v){
-	Ref r = bins[binFor(k)];
+	Reference r = bins[binFor(k)];
 	IPersistentMap map = (IPersistentMap) r.deref();
 	Entry e = map.entryAt(k);
 	if(e == null)
@@ -143,7 +143,7 @@ public V putIfAbsent(K k, V v){
 }
 
 public boolean remove(Object k, Object v){
-	Ref r = bins[binFor(k)];
+	Reference r = bins[binFor(k)];
 	IPersistentMap map = (IPersistentMap) r.deref();
 	Entry e = map.entryAt(k);
 	if(e != null && e.getValue().equals(v))
@@ -155,7 +155,7 @@ public boolean remove(Object k, Object v){
 }
 
 public boolean replace(K k, V oldv, V newv){
-	Ref r = bins[binFor(k)];
+	Reference r = bins[binFor(k)];
 	IPersistentMap map = (IPersistentMap) r.deref();
 	Entry e = map.entryAt(k);
 	if(e != null && e.getValue().equals(oldv))
@@ -167,7 +167,7 @@ public boolean replace(K k, V oldv, V newv){
 }
 
 public V replace(K k, V v){
-	Ref r = bins[binFor(k)];
+	Reference r = bins[binFor(k)];
 	IPersistentMap map = (IPersistentMap) r.deref();
 	Entry e = map.entryAt(k);
 	if(e != null)

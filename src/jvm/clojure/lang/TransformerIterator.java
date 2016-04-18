@@ -16,6 +16,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
+
+import clojure.lang.interfaces.IFn;
+
 import java.util.LinkedList;
 
 public class TransformerIterator implements Iterator {

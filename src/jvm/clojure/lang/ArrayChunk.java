@@ -14,6 +14,8 @@ package clojure.lang;
 
 import java.io.Serializable;
 
+import clojure.lang.interfaces.IFn;
+
 public final class ArrayChunk implements IChunk, Serializable {
 
 final Object[] array;

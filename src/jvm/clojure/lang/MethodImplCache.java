@@ -14,6 +14,8 @@ package clojure.lang;
 
 import java.util.Map;
 
+import clojure.lang.interfaces.IFn;
+
 public final class MethodImplCache{
 
 static public class Entry{

@@ -15,13 +15,13 @@ package clojure.lang;
 import java.math.BigInteger;
 import java.math.BigDecimal;
 
-public final class BigInt extends Number implements IHashEq{
+public final class ClojureBigInteger extends Number implements IHashEq{
 
 final public long lpart;
 final public BigInteger bipart;
 
-final public static BigInt ZERO = new BigInt(0,null);
-final public static BigInt ONE = new BigInt(1,null);
+final public static ClojureBigInteger ZERO = new ClojureBigInteger(0,null);
+final public static ClojureBigInteger ONE = new ClojureBigInteger(1,null);
 
 
 //must follow Long
@@ -41,9 +41,9 @@ public int hasheq(){
 public boolean equals(Object obj){
 	if(this == obj)
 		return true;
-	if(obj instanceof BigInt)
+	if(obj instanceof ClojureBigInteger)
 		{
-		BigInt o = (BigInt) obj;
+		ClojureBigInteger o = (ClojureBigInteger) obj;
 		if(bipart == null)
 			return o.bipart == null && this.lpart == o.lpart;
 		return o.bipart != null && this.bipart.equals(o.bipart);
@@ -51,20 +51,20 @@ public boolean equals(Object obj){
 	return false;
 }
 
-private BigInt(long lpart, BigInteger bipart){
+private ClojureBigInteger(long lpart, BigInteger bipart){
 	this.lpart = lpart;
 	this.bipart = bipart;
 }
 
-public static BigInt fromBigInteger(BigInteger val){
+public static ClojureBigInteger fromBigInteger(BigInteger val){
 	if(val.bitLength() < 64)
-		return new BigInt(val.longValue(), null);
+		return new ClojureBigInteger(val.longValue(), null);
 	else
-		return new BigInt(0, val);
+		return new ClojureBigInteger(0, val);
 }
 
-public static BigInt fromLong(long val){
-	return new BigInt(val, null);
+public static ClojureBigInteger fromLong(long val){
+	return new ClojureBigInteger(val, null);
 }
 
 public BigInteger toBigInteger(){
@@ -125,8 +125,8 @@ public short shortValue(){
 		return bipart.shortValue();
 }
 
-public static BigInt valueOf(long val){
-	return new BigInt(val, null);
+public static ClojureBigInteger valueOf(long val){
+	return new ClojureBigInteger(val, null);
 }
 
 public String toString(){
@@ -139,46 +139,54 @@ public int bitLength(){
 	return toBigInteger().bitLength();
 }
 
-public BigInt add(BigInt y) {
+public ClojureBigInteger add(ClojureBigInteger y) {
     if ((bipart == null) && (y.bipart == null)) {
         long ret = lpart + y.lpart;
         if ((ret ^ lpart) >= 0 || (ret ^ y.lpart) >= 0)
-            return BigInt.valueOf(ret);
+            return ClojureBigInteger.valueOf(ret);
     }
-    return BigInt.fromBigInteger(this.toBigInteger().add(y.toBigInteger()));
+    return ClojureBigInteger.fromBigInteger(this.toBigInteger().add(y.toBigInteger()));
 }
 
-public BigInt multiply(BigInt y) {
+public ClojureBigInteger multiply(ClojureBigInteger y) {
     if ((bipart == null) && (y.bipart == null)) {
         long ret = lpart * y.lpart;
             if (y.lpart == 0 ||
                 (ret / y.lpart == lpart && lpart != Long.MIN_VALUE))
-                return BigInt.valueOf(ret);
+                return ClojureBigInteger.valueOf(ret);
         }
-    return BigInt.fromBigInteger(this.toBigInteger().multiply(y.toBigInteger()));
+    return ClojureBigInteger.fromBigInteger(this.toBigInteger().multiply(y.toBigInteger()));
 }
 
-public BigInt quotient(BigInt y) {
+public ClojureBigInteger quotient(ClojureBigInteger y) {
     if ((bipart == null) && (y.bipart == null)) {
         if (lpart == Long.MIN_VALUE && y.lpart == -1)
-            return BigInt.fromBigInteger(this.toBigInteger().negate());
-        return BigInt.valueOf(lpart / y.lpart);
+            return ClojureBigInteger.fromBigInteger(this.toBigInteger().negate());
+        return ClojureBigInteger.valueOf(lpart / y.lpart);
     }
-    return BigInt.fromBigInteger(this.toBigInteger().divide(y.toBigInteger()));
+    return ClojureBigInteger.fromBigInteger(this.toBigInteger().divide(y.toBigInteger()));
 }
 
-public BigInt remainder(BigInt y) {
+public ClojureBigInteger remainder(ClojureBigInteger y) {
     if ((bipart == null) && (y.bipart == null)) {
-        return BigInt.valueOf(lpart % y.lpart);
+        return ClojureBigInteger.valueOf(lpart % y.lpart);
     }
-    return BigInt.fromBigInteger(this.toBigInteger().remainder(y.toBigInteger()));
+    return ClojureBigInteger.fromBigInteger(this.toBigInteger().remainder(y.toBigInteger()));
 }
 
-public boolean lt(BigInt y) {
+public boolean lt(ClojureBigInteger y) {
     if ((bipart == null) && (y.bipart == null)) {
         return lpart < y.lpart;
     }
     return this.toBigInteger().compareTo(y.toBigInteger()) < 0;
+}
+
+@WarnBoxedMath(false)
+static public Number reduceBigInt(ClojureBigInteger val){
+	if(val.bipart == null)
+		return Numbers.num(val.lpart);
+	else
+		return val.bipart;
 }
 
 }

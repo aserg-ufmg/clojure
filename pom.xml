@@ -101,7 +101,7 @@
 	<artifactId>maven-antrun-plugin</artifactId>
 	<version>1.6</version>
 	<executions>
-	  <execution>
+<!-- 	  <execution>
 	    <id>clojure-compile</id>
 	    <phase>compile</phase>
 	    <goals>
@@ -113,7 +113,7 @@
 		<ant target="compile-clojure" />
 	      </target>
 	    </configuration>
-	  </execution>
+	  </execution> -->
 	  <execution>
 	    <id>clojure-test</id>
 	    <phase>test</phase>

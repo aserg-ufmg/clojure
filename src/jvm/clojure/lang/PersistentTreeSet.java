@@ -14,7 +14,9 @@ package clojure.lang;
 
 import java.util.Comparator;
 
-public class PersistentTreeSet extends APersistentSet implements IObj, Reversible, Sorted{
+import clojure.lang.interfaces.ISeq;
+
+public class PersistentTreeSet extends APersistentSet implements IClojureObject, Reversible, Sorted{
 static public final PersistentTreeSet EMPTY = new PersistentTreeSet(null, PersistentTreeMap.EMPTY);
 final IPersistentMap _meta;
 
@@ -44,18 +46,18 @@ PersistentTreeSet(IPersistentMap meta, IPersistentMap impl){
 
 public IPersistentSet disjoin(Object key) {
 	if(contains(key))
-		return new PersistentTreeSet(meta(),impl.without(key));
+		return new PersistentTreeSet(getMeta(),impl.without(key));
 	return this;
 }
 
 public IPersistentSet cons(Object o){
 	if(contains(o))
 		return this;
-	return new PersistentTreeSet(meta(),impl.assoc(o,o));
+	return new PersistentTreeSet(getMeta(),impl.assoc(o,o));
 }
 
 public IPersistentCollection empty(){
-	return new PersistentTreeSet(meta(),(PersistentTreeMap)impl.empty());
+	return new PersistentTreeSet(getMeta(),(PersistentTreeMap)impl.empty());
 }
 
 public ISeq rseq() {
@@ -84,7 +86,7 @@ public ISeq seqFrom(Object key, boolean ascending){
 	return RT.keys(m.seqFrom(key,ascending));
 }
 
-public IPersistentMap meta(){
+public IPersistentMap getMeta(){
 	return _meta;
 }
 }

@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
+import clojure.lang.interfaces.ISeq;
+
 public abstract class APersistentSet extends AFn implements IPersistentSet, Collection, Set, Serializable, IHashEq {
 int _hash = -1;
 int _hasheq = -1;
@@ -72,7 +74,7 @@ static public boolean setEquals(IPersistentSet s1, Object obj) {
     return true;
 }
 
-public boolean equiv(Object obj){
+public boolean isEquivalent(Object obj){
 	if (!(obj instanceof Set))
         return false;
 

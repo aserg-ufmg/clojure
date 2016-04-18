@@ -14,8 +14,12 @@ package clojure.lang;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.IRef;
+import clojure.lang.interfaces.ISeq;
 
-public final class Var extends ARef implements IFn, IRef, Settable{
+
+public final class Variable extends ARef implements IFn, IRef, Settable{
 
 static class TBox{
 
@@ -29,9 +33,9 @@ public TBox(Thread t, Object val){
 }
 
 static public class Unbound extends AFn{
-	final public Var v;
+	final public Variable v;
 
-	public Unbound(Var v){
+	public Unbound(Variable v){
 		this.v = v;
 	}
 
@@ -101,12 +105,12 @@ public static void resetThreadBindingFrame(Object frame){
 	dvals.set((Frame) frame);
 }
 
-public Var setDynamic(){
+public Variable setDynamic(){
 	this.dynamic = true;
 	return this;
 }
 
-public Var setDynamic(boolean b){
+public Variable setDynamic(boolean b){
 	this.dynamic = b;
 	return this;
 }
@@ -115,59 +119,33 @@ public final boolean isDynamic(){
 	return dynamic;
 }
 
-public static Var intern(Namespace ns, Symbol sym, Object root){
-	return intern(ns, sym, root, true);
-}
-
-public static Var intern(Namespace ns, Symbol sym, Object root, boolean replaceRoot){
-	Var dvout = ns.intern(sym);
-	if(!dvout.hasRoot() || replaceRoot)
-		dvout.bindRoot(root);
-	return dvout;
-}
-
-
 public String toString(){
 	if(ns != null)
 		return "#'" + ns.name + "/" + sym;
 	return "#<Var: " + (sym != null ? sym.toString() : "--unnamed--") + ">";
 }
 
-public static Var find(Symbol nsQualifiedSym){
-	if(nsQualifiedSym.ns == null)
-		throw new IllegalArgumentException("Symbol must be namespace-qualified");
-	Namespace ns = Namespace.find(Symbol.intern(nsQualifiedSym.ns));
-	if(ns == null)
-		throw new IllegalArgumentException("No such namespace: " + nsQualifiedSym.ns);
-	return ns.findInternedVar(Symbol.intern(nsQualifiedSym.name));
-}
-
-public static Var intern(Symbol nsName, Symbol sym){
+public static Variable intern(Symbol nsName, Symbol sym){
 	Namespace ns = Namespace.findOrCreate(nsName);
-	return intern(ns, sym);
+	return Namespace.intern(ns, sym);
 }
 
-public static Var internPrivate(String nsName, String sym){
+public static Variable internPrivate(String nsName, String sym){
 	Namespace ns = Namespace.findOrCreate(Symbol.intern(nsName));
-	Var ret = intern(ns, Symbol.intern(sym));
+	Variable ret = Namespace.intern(ns, Symbol.intern(sym));
 	ret.setMeta(privateMeta);
 	return ret;
 }
 
-public static Var intern(Namespace ns, Symbol sym){
-	return ns.intern(sym);
+public static Variable create(){
+	return new Variable(null, null);
 }
 
-
-public static Var create(){
-	return new Var(null, null);
+public static Variable create(Object root){
+	return new Variable(null, null, root);
 }
 
-public static Var create(Object root){
-	return new Var(null, null, root);
-}
-
-Var(Namespace ns, Symbol sym){
+Variable(Namespace ns, Symbol sym){
 	this.ns = ns;
 	this.sym = sym;
 	this.threadBound = new AtomicBoolean(false);
@@ -175,7 +153,7 @@ Var(Namespace ns, Symbol sym){
 	setMeta(PersistentHashMap.EMPTY);
 }
 
-Var(Namespace ns, Symbol sym, Object root){
+Variable(Namespace ns, Symbol sym, Object root){
 	this(ns, sym);
 	this.root = root;
 	++rev;
@@ -240,7 +218,7 @@ public void setMacro() {
 }
 
 public boolean isMacro(){
-	return RT.booleanCast(meta().valAt(macroKey));
+	return RT.booleanCast(getMeta().valAt(macroKey));
 }
 
 //public void setExported(boolean state){
@@ -248,7 +226,7 @@ public boolean isMacro(){
 //}
 
 public boolean isPublic(){
-	return !RT.booleanCast(meta().valAt(privateKey));
+	return !RT.booleanCast(getMeta().valAt(privateKey));
 }
 
 final public Object getRawRoot(){
@@ -256,7 +234,7 @@ final public Object getRawRoot(){
 }
 
 public Object getTag(){
-	return meta().valAt(RT.TAG_KEY);
+	return getMeta().valAt(RT.TAG_KEY);
 }
 
 public void setTag(Symbol tag) {
@@ -315,7 +293,7 @@ public static void pushThreadBindings(Associative bindings){
 	for(ISeq bs = bindings.seq(); bs != null; bs = bs.next())
 		{
 		IMapEntry e = (IMapEntry) bs.first();
-		Var v = (Var) e.key();
+		Variable v = (Variable) e.key();
 		if(!v.dynamic)
 			throw new IllegalStateException(String.format("Can't dynamically bind non-dynamic var: %s/%s", v.ns, v.sym));
 		v.validate(v.getValidator(), e.val());
@@ -342,7 +320,7 @@ public static Associative getThreadBindings(){
 	for(ISeq bs = f.bindings.seq(); bs != null; bs = bs.next())
 		{
 		IMapEntry e = (IMapEntry) bs.first();
-		Var v = (Var) e.key();
+		Variable v = (Variable) e.key();
 		TBox b = (TBox) e.val();
 		ret = ret.assoc(v, b.val);
 		}

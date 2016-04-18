@@ -14,8 +14,11 @@ package clojure.lang;
 
 import java.io.StringWriter;
 
+import clojure.lang.interfaces.ISeq;
+
 public abstract class AMapEntry extends APersistentVector implements IMapEntry{
 
+@Override
 public Object nth(int i){
 	if(i == 0)
 		return key();
@@ -25,12 +28,8 @@ public Object nth(int i){
 		throw new IndexOutOfBoundsException();
 }
 
-private IPersistentVector asVector(){
-	return LazilyPersistentVector.createOwning(key(), val());
-}
-
 public IPersistentVector assocN(int i, Object val){
-	return asVector().assocN(i, val);
+	return LazilyPersistentVector.createOwning(key(), val()).assocN(i, val);
 }
 
 public int count(){
@@ -38,11 +37,11 @@ public int count(){
 }
 
 public ISeq seq(){
-	return asVector().seq();
+	return LazilyPersistentVector.createOwning(key(), val()).seq();
 }
 
 public IPersistentVector cons(Object o){
-	return asVector().cons(o);
+	return LazilyPersistentVector.createOwning(key(), val()).cons(o);
 }
 
 public IPersistentCollection empty(){

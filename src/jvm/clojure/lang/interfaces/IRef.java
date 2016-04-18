@@ -10,7 +10,10 @@
 
 /* rich Nov 18, 2007 */
 
-package clojure.lang;
+package clojure.lang.interfaces;
+
+import clojure.lang.IDeref;
+import clojure.lang.IPersistentMap;
 
 public interface IRef extends IDeref{
 

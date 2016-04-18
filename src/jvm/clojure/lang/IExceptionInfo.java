@@ -16,5 +16,5 @@ package clojure.lang;
  * defining project-specific exception classes.
  */
 public interface IExceptionInfo {
-    public IPersistentMap getData();
+    public IPersistentMap getExceptionData();
 }

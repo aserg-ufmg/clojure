@@ -38,7 +38,7 @@ package clojure.asm;
  *
  * @author Eric Bruneton
  */
-public abstract class ClassVisitor {
+public abstract class ClassVisitor extends ObjectVisitor {
 
     /**
      * The ASM API version implemented by this visitor. The value of this field

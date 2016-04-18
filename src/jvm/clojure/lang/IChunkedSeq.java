@@ -12,6 +12,8 @@
 
 package clojure.lang;
 
+import clojure.lang.interfaces.ISeq;
+
 public interface IChunkedSeq extends ISeq, Sequential {
 
 IChunk chunkedFirst() ;

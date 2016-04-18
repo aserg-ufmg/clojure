@@ -17,6 +17,8 @@ import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
+import clojure.lang.interfaces.ISeq;
+
 public class Namespace extends AReference implements Serializable {
 final public Symbol name;
 transient final AtomicReference<IPersistentMap> mappings = new AtomicReference<IPersistentMap>();
@@ -29,7 +31,7 @@ public String toString(){
 }
 
 Namespace(Symbol name){
-	super(name.meta());
+	super(name.getMeta());
 	this.name = name;
 	mappings.set(RT.DEFAULT_IMPORTS);
 	aliases.set(RT.map());
@@ -47,27 +49,27 @@ public IPersistentMap getMappings(){
 	return mappings.get();
 }
 
-public Var intern(Symbol sym){
+public Variable intern(Symbol sym){
 	if(sym.ns != null)
 		{
 		throw new IllegalArgumentException("Can't intern namespace-qualified symbol");
 		}
 	IPersistentMap map = getMappings();
 	Object o;
-	Var v = null;
+	Variable v = null;
 	while((o = map.valAt(sym)) == null)
 		{
 		if(v == null)
-			v = new Var(this, sym);
+			v = new Variable(this, sym);
 		IPersistentMap newMap = map.assoc(sym, v);
 		mappings.compareAndSet(map, newMap);
 		map = getMappings();
 		}
-	if(o instanceof Var && ((Var) o).ns == this)
-		return (Var) o;
+	if(o instanceof Variable && ((Variable) o).ns == this)
+		return (Variable) o;
 
 	if(v == null)
-		v = new Var(this, sym);
+		v = new Variable(this, sym);
 
 	warnOrFailOnReplace(sym, o, v);
 
@@ -79,10 +81,10 @@ public Var intern(Symbol sym){
 }
 
 private void warnOrFailOnReplace(Symbol sym, Object o, Object v){
-    if (o instanceof Var)
+    if (o instanceof Variable)
         {
-        Namespace ns = ((Var)o).ns;
-        if (ns == this || (v instanceof Var && ((Var)v).ns  == RT.CLOJURE_NS))
+        Namespace ns = ((Variable)o).ns;
+        if (ns == this || (v instanceof Variable && ((Variable)v).ns  == RT.CLOJURE_NS))
             return;
         if (ns != RT.CLOJURE_NS)
             throw new IllegalStateException(sym + " already refers to: " + o + " in namespace: " + name);
@@ -164,8 +166,8 @@ public Class importClass(Class c){
 	return importClass(Symbol.intern(n.substring(n.lastIndexOf('.') + 1)), c);
 }
 
-public Var refer(Symbol sym, Var var){
-	return (Var) reference(sym, var);
+public Variable refer(Symbol sym, Variable var){
+	return (Variable) reference(sym, var);
 
 }
 
@@ -192,10 +194,10 @@ public Object getMapping(Symbol name){
 	return mappings.get().valAt(name);
 }
 
-public Var findInternedVar(Symbol symbol){
+public Variable findInternedVar(Symbol symbol){
 	Object o = mappings.get().valAt(symbol);
-	if(o != null && o instanceof Var && ((Var) o).ns == this)
-		return (Var) o;
+	if(o != null && o instanceof Variable && ((Variable) o).ns == this)
+		return (Variable) o;
 	return null;
 }
 
@@ -239,5 +241,20 @@ private Object readResolve() throws ObjectStreamException {
     // ensures that serialized namespaces are "deserialized" to the
     // namespace in the present runtime
     return findOrCreate(name);
+}
+
+public static Variable intern(Namespace ns, Symbol sym, Object root, boolean replaceRoot){
+	Variable dvout = ns.intern(sym);
+	if(!dvout.hasRoot() || replaceRoot)
+		dvout.bindRoot(root);
+	return dvout;
+}
+
+public static Variable intern(Namespace ns, Symbol sym, Object root){
+	return Namespace.intern(ns, sym, root, true);
+}
+
+public static Variable intern(Namespace ns, Symbol sym){
+	return ns.intern(sym);
 }
 }

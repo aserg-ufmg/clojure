@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.util.Iterator;
 
+import clojure.lang.interfaces.ISeq;
+
 public class IteratorSeq extends ASeq{
 final Iterator iter;
 final State state;

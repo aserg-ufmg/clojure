@@ -12,6 +12,8 @@
 
 package clojure.lang;
 
+import clojure.lang.interfaces.IFn;
+
 public interface IChunk extends Indexed{
 
 IChunk dropFirst();

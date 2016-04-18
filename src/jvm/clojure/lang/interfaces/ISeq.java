@@ -8,7 +8,9 @@
  * You must not remove this notice, or any other, from this software.
  */
 
-package clojure.lang;
+package clojure.lang.interfaces;
+
+import clojure.lang.IPersistentCollection;
 
 /**
  * A persistent, functional, sequence interface

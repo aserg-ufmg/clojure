@@ -19,7 +19,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class PersistentVector extends APersistentVector implements IObj, IEditableCollection, IReduce, IKVReduce{
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
+public class PersistentVector extends APersistentVector implements IClojureObject, IEditableCollection, IReduce, IKVReduce{
 
 public static class Node implements Serializable {
 	transient public final AtomicReference<Thread> edit;
@@ -178,10 +181,10 @@ public PersistentVector assocN(int i, Object val){
 			System.arraycopy(tail, 0, newTail, 0, tail.length);
 			newTail[i & 0x01f] = val;
 
-			return new PersistentVector(meta(), cnt, shift, root, newTail);
+			return new PersistentVector(getMeta(), cnt, shift, root, newTail);
 			}
 
-		return new PersistentVector(meta(), cnt, shift, doAssoc(shift, root, i, val), tail);
+		return new PersistentVector(getMeta(), cnt, shift, doAssoc(shift, root, i, val), tail);
 		}
 	if(i == cnt)
 		return cons(val);
@@ -210,7 +213,7 @@ public PersistentVector withMeta(IPersistentMap meta){
 	return new PersistentVector(meta, cnt, shift, root, tail);
 }
 
-public IPersistentMap meta(){
+public IPersistentMap getMeta(){
 	return _meta;
 }
 
@@ -223,7 +226,7 @@ public PersistentVector cons(Object val){
 		Object[] newTail = new Object[tail.length + 1];
 		System.arraycopy(tail, 0, newTail, 0, tail.length);
 		newTail[tail.length] = val;
-		return new PersistentVector(meta(), cnt + 1, shift, root, newTail);
+		return new PersistentVector(getMeta(), cnt + 1, shift, root, newTail);
 		}
 	//full tail, push into tree
 	Node newroot;
@@ -239,7 +242,7 @@ public PersistentVector cons(Object val){
 		}
 	else
 		newroot = pushTail(shift, root, tailnode);
-	return new PersistentVector(meta(), cnt + 1, newshift, newroot, new Object[]{val});
+	return new PersistentVector(getMeta(), cnt + 1, newshift, newroot, new Object[]{val});
 }
 
 private Node pushTail(int level, Node parent, Node tailnode){
@@ -407,7 +410,7 @@ static public final class ChunkedSeq extends ASeq implements IChunkedSeq,Counted
 		return s;
 	}
 
-	public Obj withMeta(IPersistentMap meta){
+	public ClojureObject withMeta(IPersistentMap meta){
 		if(meta == this._meta)
 			return this;
 		return new ChunkedSeq(meta, vec, node, i, offset);
@@ -429,7 +432,7 @@ static public final class ChunkedSeq extends ASeq implements IChunkedSeq,Counted
 }
 
 public IPersistentCollection empty(){
-	return EMPTY.withMeta(meta());
+	return EMPTY.withMeta(getMeta());
 }
 
 //private Node pushTail(int level, Node node, Object[] tailNode, Box expansion){
@@ -467,13 +470,13 @@ public PersistentVector pop(){
 	if(cnt == 0)
 		throw new IllegalStateException("Can't pop empty vector");
 	if(cnt == 1)
-		return EMPTY.withMeta(meta());
+		return EMPTY.withMeta(getMeta());
 	//if(tail.length > 1)
 	if(cnt-tailoff() > 1)
 		{
 		Object[] newTail = new Object[tail.length - 1];
 		System.arraycopy(tail, 0, newTail, 0, newTail.length);
-		return new PersistentVector(meta(), cnt - 1, shift, root, newTail);
+		return new PersistentVector(getMeta(), cnt - 1, shift, root, newTail);
 		}
 	Object[] newtail = arrayFor(cnt - 2);
 
@@ -488,7 +491,7 @@ public PersistentVector pop(){
 		newroot = (Node) newroot.array[0];
 		newshift -= 5;
 		}
-	return new PersistentVector(meta(), cnt - 1, newshift, newroot, newtail);
+	return new PersistentVector(getMeta(), cnt - 1, newshift, newroot, newtail);
 }
 
 private Node popTail(int level, Node node){

@@ -12,14 +12,17 @@
 
 package clojure.lang;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 public class FnLoaderThunk extends RestFn{
 
-final Var v;
+final Variable v;
 final ClassLoader loader;
 final String fnClassName;
 IFn fn;
 
-public FnLoaderThunk(Var v, String fnClassName){
+public FnLoaderThunk(Variable v, String fnClassName){
 	this.v = v;
 	this.loader = (ClassLoader) RT.FN_LOADER_VAR.get();
 	this.fnClassName = fnClassName;
@@ -65,11 +68,11 @@ public int getRequiredArity(){
 	return 0;
 }
 
-public IObj withMeta(IPersistentMap meta){
+public IClojureObject withMeta(IPersistentMap meta){
 	return this;
 }
 
-public IPersistentMap meta(){
+public IPersistentMap getMeta(){
 	return null;
 }
 }

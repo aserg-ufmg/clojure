@@ -10,9 +10,9 @@
 
 package clojure.java.api;
 
-import clojure.lang.IFn;
 import clojure.lang.Symbol;
-import clojure.lang.Var;
+import clojure.lang.Variable;
+import clojure.lang.interfaces.IFn;
 
 /**
  * <p>The Clojure class provides a minimal interface to bootstrap Clojure access
@@ -21,7 +21,7 @@ import clojure.lang.Var;
  * <ol>
  * <li>The ability to use Clojure's namespaces to locate an arbitrary
  * <a href="http://clojure.org/vars">var</a>, returning the
- * var's {@link clojure.lang.IFn} interface.</li>
+ * var's {@link clojure.lang.interfaces.IFn} interface.</li>
  * <li>A convenience method <code>read</code> for reading data using
  * Clojure's edn reader</li>
  * </ol>
@@ -79,7 +79,7 @@ public class Clojure {
      * @return          a clojure.lang.IFn
      */
     public static IFn var(Object ns, Object name) {
-        return Var.intern(asSym(ns), asSym(name));
+        return Variable.intern(asSym(ns), asSym(name));
     }
 
     /**

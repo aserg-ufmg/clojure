@@ -12,6 +12,8 @@
 
 package clojure.lang;
 
+import clojure.lang.interfaces.IFn;
+
 public interface IReduce extends IReduceInit{
 Object reduce(IFn f) ;
 }

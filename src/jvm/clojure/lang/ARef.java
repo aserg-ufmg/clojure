@@ -14,6 +14,10 @@ package clojure.lang;
 
 import java.util.Map;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.IRef;
+import clojure.lang.interfaces.ISeq;
+
 public abstract class ARef extends AReference implements IRef{
 protected volatile IFn validator = null;
 private volatile IPersistentMap watches = PersistentHashMap.EMPTY;

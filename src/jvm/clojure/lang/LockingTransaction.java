@@ -15,6 +15,10 @@ package clojure.lang;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.CountDownLatch;
@@ -104,14 +108,14 @@ long startPoint;
 long startTime;
 final RetryEx retryex = new RetryEx();
 final ArrayList<Agent.Action> actions = new ArrayList<Agent.Action>();
-final HashMap<Ref, Object> vals = new HashMap<Ref, Object>();
-final HashSet<Ref> sets = new HashSet<Ref>();
-final TreeMap<Ref, ArrayList<CFn>> commutes = new TreeMap<Ref, ArrayList<CFn>>();
+final HashMap<Reference, Object> vals = new HashMap<Reference, Object>();
+final HashSet<Reference> sets = new HashSet<Reference>();
+final TreeMap<Reference, ArrayList<CFn>> commutes = new TreeMap<Reference, ArrayList<CFn>>();
 
-final HashSet<Ref> ensures = new HashSet<Ref>();   //all hold readLock
+final HashSet<Reference> ensures = new HashSet<Reference>();   //all hold readLock
 
 
-void tryWriteLock(Ref ref){
+void tryWriteLock(Reference ref){
 	try
 		{
 		if(!ref.lock.writeLock().tryLock(LOCK_WAIT_MSECS, TimeUnit.MILLISECONDS))
@@ -124,7 +128,7 @@ void tryWriteLock(Ref ref){
 }
 
 //returns the most recent val
-Object lock(Ref ref){
+Object lock(Reference ref){
 	//can't upgrade readLock, so release it
 	releaseIfEnsured(ref);
 
@@ -172,7 +176,7 @@ private Object blockAndBail(Info refinfo){
 	throw retryex;
 }
 
-private void releaseIfEnsured(Ref ref){
+private void releaseIfEnsured(Reference ref){
 	if(ensures.contains(ref))
 		{
 		ensures.remove(ref);
@@ -242,11 +246,11 @@ static public Object runInTransaction(Callable fn) throws Exception{
 }
 
 static class Notify{
-	final public Ref ref;
+	final public Reference ref;
 	final public Object oldval;
 	final public Object newval;
 
-	Notify(Ref ref, Object oldval, Object newval){
+	Notify(Reference ref, Object oldval, Object newval){
 		this.ref = ref;
 		this.oldval = oldval;
 		this.newval = newval;
@@ -256,7 +260,7 @@ static class Notify{
 Object run(Callable fn) throws Exception{
 	boolean done = false;
 	Object ret = null;
-	ArrayList<Ref> locked = new ArrayList<Ref>();
+	ArrayList<Reference> locked = new ArrayList<Reference>();
 	ArrayList<Notify> notify = new ArrayList<Notify>();
 
 	for(int i = 0; !done && i < RETRY_LIMIT; i++)
@@ -274,9 +278,9 @@ Object run(Callable fn) throws Exception{
 			//make sure no one has killed us before this point, and can't from now on
 			if(info.status.compareAndSet(RUNNING, COMMITTING))
 				{
-				for(Map.Entry<Ref, ArrayList<CFn>> e : commutes.entrySet())
+				for(Map.Entry<Reference, ArrayList<CFn>> e : commutes.entrySet())
 					{
-					Ref ref = e.getKey();
+					Reference ref = e.getKey();
 					if(sets.contains(ref)) continue;
 					
 					boolean wasEnsured = ensures.contains(ref);
@@ -300,37 +304,37 @@ Object run(Callable fn) throws Exception{
 						vals.put(ref, f.fn.applyTo(RT.cons(vals.get(ref), f.args)));
 						}
 					}
-				for(Ref ref : sets)
+				for(Reference ref : sets)
 					{
 					tryWriteLock(ref);
 					locked.add(ref);
 					}
 
 				//validate and enqueue notifications
-				for(Map.Entry<Ref, Object> e : vals.entrySet())
+				for(Map.Entry<Reference, Object> e : vals.entrySet())
 					{
-					Ref ref = e.getKey();
+					Reference ref = e.getKey();
 					ref.validate(ref.getValidator(), e.getValue());
 					}
 
 				//at this point, all values calced, all refs to be written locked
 				//no more client code to be called
 				long commitPoint = getCommitPoint();
-				for(Map.Entry<Ref, Object> e : vals.entrySet())
+				for(Map.Entry<Reference, Object> e : vals.entrySet())
 					{
-					Ref ref = e.getKey();
+					Reference ref = e.getKey();
 					Object oldval = ref.tvals == null ? null : ref.tvals.val;
 					Object newval = e.getValue();
 					int hcount = ref.histCount();
 
 					if(ref.tvals == null)
 						{
-						ref.tvals = new Ref.TVal(newval, commitPoint);
+						ref.tvals = new Reference.TVal(newval, commitPoint);
 						}
 					else if((ref.faults.get() > 0 && hcount < ref.maxHistory)
 							|| hcount < ref.minHistory)
 						{
-						ref.tvals = new Ref.TVal(newval, commitPoint, ref.tvals);
+						ref.tvals = new Reference.TVal(newval, commitPoint, ref.tvals);
 						ref.faults.set(0);
 						}
 					else
@@ -358,7 +362,7 @@ Object run(Callable fn) throws Exception{
 				locked.get(k).lock.writeLock().unlock();
 				}
 			locked.clear();
-			for(Ref r : ensures)
+			for(Reference r : ensures)
 				{
 				r.lock.readLock().unlock();
 				}
@@ -394,7 +398,7 @@ public void enqueue(Agent.Action action){
 	actions.add(action);
 }
 
-Object doGet(Ref ref){
+Object doGet(Reference ref){
 	if(!info.running())
 		throw retryex;
 	if(vals.containsKey(ref))
@@ -404,7 +408,7 @@ Object doGet(Ref ref){
 		ref.lock.readLock().lock();
 		if(ref.tvals == null)
 			throw new IllegalStateException(ref.toString() + " is unbound.");
-		Ref.TVal ver = ref.tvals;
+		Reference.TVal ver = ref.tvals;
 		do
 			{
 			if(ver.point <= readPoint)
@@ -421,7 +425,7 @@ Object doGet(Ref ref){
 
 }
 
-Object doSet(Ref ref, Object val){
+Object doSet(Reference ref, Object val){
 	if(!info.running())
 		throw retryex;
 	if(commutes.containsKey(ref))
@@ -435,7 +439,7 @@ Object doSet(Ref ref, Object val){
 	return val;
 }
 
-void doEnsure(Ref ref){
+void doEnsure(Reference ref){
 	if(!info.running())
 		throw retryex;
 	if(ensures.contains(ref))
@@ -464,7 +468,7 @@ void doEnsure(Ref ref){
 		ensures.add(ref);
 }
 
-Object doCommute(Ref ref, IFn fn, ISeq args) {
+Object doCommute(Reference ref, IFn fn, ISeq args) {
 	if(!info.running())
 		throw retryex;
 	if(!vals.containsKey(ref))

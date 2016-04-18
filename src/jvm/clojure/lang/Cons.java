@@ -14,6 +14,8 @@ package clojure.lang;
 
 import java.io.Serializable;
 
+import clojure.lang.interfaces.ISeq;
+
 final public class Cons extends ASeq implements Serializable {
 
 private final Object _first;

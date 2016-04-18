@@ -18,6 +18,9 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import clojure.lang.interfaces.ISeq;
+
 import java.lang.ref.ReferenceQueue;
 
 public class Util{
@@ -121,8 +124,8 @@ static public boolean equiv(char c1, char c2) {
 
 static public boolean pcequiv(Object k1, Object k2){
 	if(k1 instanceof IPersistentCollection)
-		return ((IPersistentCollection)k1).equiv(k2);
-	return ((IPersistentCollection)k2).equiv(k1);
+		return ((IPersistentCollection)k1).isEquivalent(k2);
+	return ((IPersistentCollection)k2).isEquivalent(k1);
 }
 
 static public boolean equals(Object k1, Object k2){
@@ -165,16 +168,12 @@ public static int hasheq(Object o){
 	if(o == null)
 		return 0;
 	if(o instanceof IHashEq)
-		return dohasheq((IHashEq) o);	
+		return ((IHashEq) o).hasheq();	
 	if(o instanceof Number)
 		return Numbers.hasheq((Number)o);
 	if(o instanceof String)
 		return Murmur3.hashInt(o.hashCode());
 	return o.hashCode();
-}
-
-private static int dohasheq(IHashEq o) {
-	return o.hasheq();
 }
 
 static public int hashCombine(int seed, int hash){
@@ -190,7 +189,7 @@ static public boolean isPrimitive(Class c){
 static public boolean isInteger(Object x){
 	return x instanceof Integer
 			|| x instanceof Long
-	        || x instanceof BigInt
+	        || x instanceof ClojureBigInteger
 			|| x instanceof BigInteger;
 }
 
@@ -245,13 +244,13 @@ static private <T extends Throwable> void sneakyThrow0(Throwable t) throws T {
 }
 
 static public Object loadWithClass(String scriptbase, Class<?> loadFrom) throws IOException, ClassNotFoundException{
-    Var.pushThreadBindings(RT.map(new Object[] { Compiler.LOADER, loadFrom.getClassLoader() }));
+    Variable.pushThreadBindings(RT.map(new Object[] { Compiler.LOADER, loadFrom.getClassLoader() }));
     try {
         return RT.var("clojure.core", "load").invoke(scriptbase);
     }
     finally
     {
-        Var.popThreadBindings();
+        Variable.popThreadBindings();
     }
 }
 

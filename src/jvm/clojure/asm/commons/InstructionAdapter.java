@@ -42,7 +42,7 @@ import clojure.asm.Type;
  *
  * @author Eric Bruneton
  */
-public class InstructionAdapter extends MethodVisitor {
+public class InstructionAdapter extends MethodVisitor implements IStackablle {
 
     public final static Type OBJECT_TYPE = Type.getType("Ljava/lang/Object;");
 
@@ -736,11 +736,19 @@ public class InstructionAdapter extends MethodVisitor {
         mv.visitInsn(type.getOpcode(Opcodes.IASTORE));
     }
 
-    public void pop() {
+    /* (non-Javadoc)
+	 * @see clojure.asm.commons.IStackablle#pop()
+	 */
+    @Override
+	public void pop() {
         mv.visitInsn(Opcodes.POP);
     }
 
-    public void pop2() {
+    /* (non-Javadoc)
+	 * @see clojure.asm.commons.IStackablle#pop2()
+	 */
+    @Override
+	public void pop2() {
         mv.visitInsn(Opcodes.POP2);
     }
 

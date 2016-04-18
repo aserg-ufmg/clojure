@@ -12,6 +12,9 @@
 
 package clojure.lang;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 public class AReference implements IReference {
     private IPersistentMap _meta;
 
@@ -23,7 +26,7 @@ public class AReference implements IReference {
         _meta = meta;
     }
 
-    synchronized public IPersistentMap meta() {
+    synchronized public IPersistentMap getMeta() {
         return _meta;
     }
 

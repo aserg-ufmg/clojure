@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 public class EdnReader{
 
 static IFn[] macros = new IFn[256];
@@ -315,7 +318,7 @@ private static Object matchNumber(String s){
 		if(m.group(2) != null)
 			{
 			if(m.group(8) != null)
-				return BigInt.ZERO;
+				return ClojureBigInteger.ZERO;
 			return Numbers.num(0);
 			}
 		boolean negate = (m.group(1).equals("-"));
@@ -335,10 +338,10 @@ private static Object matchNumber(String s){
 		if(negate)
 			bn = bn.negate();
 		if(m.group(8) != null)
-			return BigInt.fromBigInteger(bn);
+			return ClojureBigInteger.fromBigInteger(bn);
 		return bn.bitLength() < 64 ?
 		       Numbers.num(bn.longValue())
-		                           : BigInt.fromBigInteger(bn);
+		                           : ClojureBigInteger.fromBigInteger(bn);
 		}
 	m = floatPat.matcher(s);
 	if(m.matches())
@@ -353,8 +356,8 @@ private static Object matchNumber(String s){
 		String numerator = m.group(1);
 		if (numerator.startsWith("+")) numerator = numerator.substring(1);
 
-		return Numbers.divide(Numbers.reduceBigInt(BigInt.fromBigInteger(new BigInteger(numerator))),
-		                      Numbers.reduceBigInt(BigInt.fromBigInteger(new BigInteger(m.group(2)))));
+		return Numbers.divide(ClojureBigInteger.reduceBigInt(ClojureBigInteger.fromBigInteger(new BigInteger(numerator))),
+		                      ClojureBigInteger.reduceBigInt(ClojureBigInteger.fromBigInteger(new BigInteger(m.group(2)))));
 		}
 	return null;
 }
@@ -538,7 +541,7 @@ public static class MetaReader extends AFn{
 			IMapEntry kv = (IMapEntry) s.first();
 			ometa = RT.assoc(ometa, kv.getKey(), kv.getValue());
 			}
-			return ((IObj) o).withMeta((IPersistentMap) ometa);
+			return ((IClojureObject) o).withMeta((IPersistentMap) ometa);
 			}
 		else
 			throw new IllegalArgumentException("Metadata can only be applied to IMetas");
@@ -602,7 +605,7 @@ public static class ListReader extends AFn{
 		List list = readDelimitedList(')', r, true, opts);
 		if(list.isEmpty())
 			return PersistentList.EMPTY;
-		IObj s = (IObj) PersistentList.create(list);
+		IClojureObject s = (IClojureObject) PersistentList.create(list);
 //		IObj s = (IObj) RT.seq(list);
 //		if(line != -1)
 //			{

@@ -12,6 +12,9 @@
 
 package clojure.lang;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 public abstract class AFn implements IFn {
 
 public Object call() {

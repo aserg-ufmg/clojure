@@ -15,6 +15,8 @@ package clojure.lang;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import clojure.lang.interfaces.ISeq;
+
 public class SeqIterator implements Iterator{
 
 static final Object START = new Object();

@@ -15,6 +15,9 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 /*
  A persistent rendition of Phil Bagwell's Hash Array Mapped Trie
 
@@ -25,7 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
  Any errors are my own
  */
 
-public class PersistentHashMap extends APersistentMap implements IEditableCollection, IObj, IMapIterable, IKVReduce {
+public class PersistentHashMap extends APersistentMap implements IEditableCollection, IClojureObject, IMapIterable, IKVReduce {
 
 final int count;
 final INode root;
@@ -136,14 +139,14 @@ public IPersistentMap assoc(Object key, Object val){
 	if(key == null) {
 		if(hasNull && val == nullValue)
 			return this;
-		return new PersistentHashMap(meta(), hasNull ? count : count + 1, root, true, val);
+		return new PersistentHashMap(getMeta(), hasNull ? count : count + 1, root, true, val);
 	}
 	Box addedLeaf = new Box(null);
 	INode newroot = (root == null ? BitmapIndexedNode.EMPTY : root) 
 			.assoc(0, hash(key), key, val, addedLeaf);
 	if(newroot == root)
 		return this;
-	return new PersistentHashMap(meta(), addedLeaf.val == null ? count : count + 1, newroot, hasNull, nullValue);
+	return new PersistentHashMap(getMeta(), addedLeaf.val == null ? count : count + 1, newroot, hasNull, nullValue);
 }
 
 public Object valAt(Object key, Object notFound){
@@ -164,13 +167,13 @@ public IPersistentMap assocEx(Object key, Object val) {
 
 public IPersistentMap without(Object key){
 	if(key == null)
-		return hasNull ? new PersistentHashMap(meta(), count - 1, root, false, null) : this;
+		return hasNull ? new PersistentHashMap(getMeta(), count - 1, root, false, null) : this;
 	if(root == null)
 		return this;
 	INode newroot = root.without(0, hash(key), key);
 	if(newroot == root)
 		return this;
-	return new PersistentHashMap(meta(), count - 1, newroot, hasNull, nullValue); 
+	return new PersistentHashMap(getMeta(), count - 1, newroot, hasNull, nullValue); 
 }
 
 static final Iterator EMPTY_ITER = new Iterator(){
@@ -268,7 +271,7 @@ public ISeq seq(){
 }
 
 public IPersistentCollection empty(){
-	return EMPTY.withMeta(meta());	
+	return EMPTY.withMeta(getMeta());	
 }
 
 static int mask(int hash, int shift){
@@ -284,7 +287,7 @@ public TransientHashMap asTransient() {
 	return new TransientHashMap(this);
 }
 
-public IPersistentMap meta(){
+public IPersistentMap getMeta(){
 	return _meta;
 }
 
@@ -608,7 +611,7 @@ final static class ArrayNode implements INode{
 			this.s = s;
 		}
 
-		public Obj withMeta(IPersistentMap meta) {
+		public ClojureObject withMeta(IPersistentMap meta) {
 			return new Seq(meta, nodes, i, s);
 		}
 
@@ -1336,7 +1339,7 @@ static final class NodeSeq extends ASeq {
 		this.s = s;
 	}
 
-	public Obj withMeta(IPersistentMap meta) {
+	public ClojureObject withMeta(IPersistentMap meta) {
 		return new NodeSeq(meta, array, i, s);
 	}
 

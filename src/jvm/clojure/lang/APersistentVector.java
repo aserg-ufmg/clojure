@@ -15,6 +15,9 @@ package clojure.lang;
 import java.io.Serializable;
 import java.util.*;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 public abstract class APersistentVector extends AFn implements IPersistentVector, Iterable,
                                                                List,
                                                                RandomAccess, Comparable,
@@ -132,7 +135,7 @@ public boolean equals(Object obj){
 	return doEquals(this, obj);
 }
 
-public boolean equiv(Object obj){
+public boolean isEquivalent(Object obj){
     if(obj == this)
         return true;
 	return doEquiv(this, obj);
@@ -538,7 +541,7 @@ public static class RSeq extends ASeq implements IndexedSeq, Counted{
 	}
 }
 
-public static class SubVector extends APersistentVector implements IObj{
+public static class SubVector extends APersistentVector implements IClojureObject{
 	public final IPersistentVector v;
 	public final int start;
 	public final int end;
@@ -591,7 +594,7 @@ public static class SubVector extends APersistentVector implements IObj{
 	}
 
 	public IPersistentCollection empty(){
-		return PersistentVector.EMPTY.withMeta(meta());
+		return PersistentVector.EMPTY.withMeta(getMeta());
 	}
 
 	public IPersistentStack pop(){
@@ -608,7 +611,7 @@ public static class SubVector extends APersistentVector implements IObj{
 		return new SubVector(meta, v, start, end);
 	}
 
-	public IPersistentMap meta(){
+	public IPersistentMap getMeta(){
 		return _meta;
 	}
 }

@@ -15,6 +15,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 //import java.util.concurrent.ConcurrentLinkedQueue;
 
+import clojure.lang.interfaces.ISeq;
+
 /**
  * conses onto rear, peeks/pops from front
  * See Okasaki's Batched Queues
@@ -22,7 +24,7 @@ import java.util.NoSuchElementException;
  * so no reversing or suspensions required for persistent use
  */
 
-public class PersistentQueue extends Obj implements IPersistentList, Collection, Counted, IHashEq{
+public class PersistentQueue extends ClojureObject implements IPersistentList, Collection, Counted, IHashEq{
 
 final public static PersistentQueue EMPTY = new PersistentQueue(null, 0, null, null);
 
@@ -41,7 +43,7 @@ PersistentQueue(IPersistentMap meta, int cnt, ISeq f, PersistentVector r){
 	this.r = r;
 }
 
-public boolean equiv(Object obj){
+public boolean isEquivalent(Object obj){
 
 	if(!(obj instanceof Sequential))
 		return false;
@@ -111,7 +113,7 @@ public PersistentQueue pop(){
 		f1 = RT.seq(r);
 		r1 = null;
 		}
-	return new PersistentQueue(meta(), cnt - 1, f1, r1);
+	return new PersistentQueue(getMeta(), cnt - 1, f1, r1);
 }
 
 public int count(){
@@ -126,13 +128,13 @@ public ISeq seq(){
 
 public PersistentQueue cons(Object o){
 	if(f == null)     //empty
-		return new PersistentQueue(meta(), cnt + 1, RT.list(o), null);
+		return new PersistentQueue(getMeta(), cnt + 1, RT.list(o), null);
 	else
-		return new PersistentQueue(meta(), cnt + 1, f, (r != null ? r : PersistentVector.EMPTY).cons(o));
+		return new PersistentQueue(getMeta(), cnt + 1, f, (r != null ? r : PersistentVector.EMPTY).cons(o));
 }
 
 public IPersistentCollection empty(){
-	return EMPTY.withMeta(meta());
+	return EMPTY.withMeta(getMeta());
 }
 
 public PersistentQueue withMeta(IPersistentMap meta){

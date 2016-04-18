@@ -13,5 +13,5 @@
 package clojure.lang;
 
 public interface IMeta {
-    IPersistentMap meta();
+    IPersistentMap getMeta();
 }

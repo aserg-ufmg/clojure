@@ -696,7 +696,7 @@ final class Frame {
             return outputStack[--outputStackTop];
         } else {
             // if the output frame stack is empty, pops from the input stack
-            return STACK | -(--owner.inputStackTop);
+            return (STACK | -(--owner.inputStackTop));
         }
     }
 

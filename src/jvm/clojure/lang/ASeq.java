@@ -13,7 +13,9 @@ package clojure.lang;
 import java.io.Serializable;
 import java.util.*;
 
-public abstract class ASeq extends Obj implements ISeq, Sequential, List, Serializable, IHashEq {
+import clojure.lang.interfaces.ISeq;
+
+public abstract class ASeq extends ClojureObject implements ISeq, Sequential, List, Serializable, IHashEq {
 transient int _hash;
 transient int _hasheq;
 
@@ -33,7 +35,7 @@ protected ASeq(IPersistentMap meta){
 protected ASeq(){
 }
 
-public boolean equiv(Object obj){
+public boolean isEquivalent(Object obj){
 
 	if(!(obj instanceof Sequential || obj instanceof List))
 		return false;
@@ -208,13 +210,8 @@ public Iterator iterator(){
 
 
 
-//////////// List stuff /////////////////
-private List reify(){
-	return Collections.unmodifiableList(new ArrayList(this));
-}
-
 public List subList(int fromIndex, int toIndex){
-	return reify().subList(fromIndex, toIndex);
+	return Collections.unmodifiableList(new ArrayList(this)).subList(fromIndex, toIndex);
 }
 
 public Object set(int index, Object element){
@@ -236,15 +233,15 @@ public int indexOf(Object o){
 }
 
 public int lastIndexOf(Object o){
-	return reify().lastIndexOf(o);
+	return Collections.unmodifiableList(new ArrayList(this)).lastIndexOf(o);
 }
 
 public ListIterator listIterator(){
-	return reify().listIterator();
+	return Collections.unmodifiableList(new ArrayList(this)).listIterator();
 }
 
 public ListIterator listIterator(int index){
-	return reify().listIterator(index);
+	return Collections.unmodifiableList(new ArrayList(this)).listIterator(index);
 }
 
 public Object get(int index){

@@ -14,7 +14,9 @@ package clojure.lang;
 
 import java.util.List;
 
-public class PersistentHashSet extends APersistentSet implements IObj, IEditableCollection {
+import clojure.lang.interfaces.ISeq;
+
+public class PersistentHashSet extends APersistentSet implements IClojureObject, IEditableCollection {
 
 static public final PersistentHashSet EMPTY = new PersistentHashSet(null, PersistentHashMap.EMPTY);
 
@@ -89,18 +91,18 @@ PersistentHashSet(IPersistentMap meta, IPersistentMap impl){
 
 public IPersistentSet disjoin(Object key) {
 	if(contains(key))
-		return new PersistentHashSet(meta(),impl.without(key));
+		return new PersistentHashSet(getMeta(),impl.without(key));
 	return this;
 }
 
 public IPersistentSet cons(Object o){
 	if(contains(o))
 		return this;
-	return new PersistentHashSet(meta(),impl.assoc(o,o));
+	return new PersistentHashSet(getMeta(),impl.assoc(o,o));
 }
 
 public IPersistentCollection empty(){
-	return EMPTY.withMeta(meta());	
+	return EMPTY.withMeta(getMeta());	
 }
 
 public PersistentHashSet withMeta(IPersistentMap meta){
@@ -111,7 +113,7 @@ public ITransientCollection asTransient() {
 	return new TransientHashSet(((PersistentHashMap) impl).asTransient());
 }
 
-public IPersistentMap meta(){
+public IPersistentMap getMeta(){
 	return _meta;
 }
 

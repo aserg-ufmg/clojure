@@ -32,7 +32,7 @@ public class ExceptionInfo extends RuntimeException implements IExceptionInfo {
         }
     }
 
-    public IPersistentMap getData() {
+    public IPersistentMap getExceptionData() {
         return data;
     }
 

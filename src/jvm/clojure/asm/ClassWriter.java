@@ -905,7 +905,7 @@ public class ClassWriter extends ClassVisitor {
             ianns.put(out);
         }
         if (attrs != null) {
-            attrs.put(this, null, 0, -1, -1, out);
+            attrs.writeAllAtributes(this, null, 0, -1, -1, out);
         }
         if (invalidFrames) {
             ClassWriter cw = new ClassWriter(COMPUTE_FRAMES);

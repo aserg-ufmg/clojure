@@ -37,6 +37,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 public class LispReader{
 
 static final Symbol QUOTE = Symbol.intern("quote");
@@ -76,13 +79,13 @@ static Pattern floatPat = Pattern.compile("([-+]?[0-9]+(\\.[0-9]*)?([eE][-+]?[0-
 //static Pattern classNamePat = Pattern.compile("([a-zA-Z_][\\w\\.]*)\\.");
 
 //symbol->gensymbol
-static Var GENSYM_ENV = Var.create(null).setDynamic();
+static Variable GENSYM_ENV = Variable.create(null).setDynamic();
 //sorted-map num->gensymbol
-static Var ARG_ENV = Var.create(null).setDynamic();
+static Variable ARG_ENV = Variable.create(null).setDynamic();
 static IFn ctorReader = new CtorReader();
 
 // Dynamic var set to true in a read-cond context
-static Var READ_COND_ENV = Var.create(null).setDynamic();
+static Variable READ_COND_ENV = Variable.create(null).setDynamic();
 
 static
 	{
@@ -433,7 +436,7 @@ private static Object matchNumber(String s){
 		if(m.group(2) != null)
 			{
 			if(m.group(8) != null)
-				return BigInt.ZERO;
+				return ClojureBigInteger.ZERO;
 			return Numbers.num(0);
 			}
 		boolean negate = (m.group(1).equals("-"));
@@ -453,10 +456,10 @@ private static Object matchNumber(String s){
 		if(negate)
 			bn = bn.negate();
 		if(m.group(8) != null)
-			return BigInt.fromBigInteger(bn);
+			return ClojureBigInteger.fromBigInteger(bn);
 		return bn.bitLength() < 64 ?
 		       Numbers.num(bn.longValue())
-		                           : BigInt.fromBigInteger(bn);
+		                           : ClojureBigInteger.fromBigInteger(bn);
 		}
 	m = floatPat.matcher(s);
 	if(m.matches())
@@ -471,8 +474,8 @@ private static Object matchNumber(String s){
 		String numerator = m.group(1);
 		if (numerator.startsWith("+")) numerator = numerator.substring(1);
 
-		return Numbers.divide(Numbers.reduceBigInt(BigInt.fromBigInteger(new BigInteger(numerator))),
-		                      Numbers.reduceBigInt(BigInt.fromBigInteger(new BigInteger(m.group(2)))));
+		return Numbers.divide(ClojureBigInteger.reduceBigInt(ClojureBigInteger.fromBigInteger(new BigInteger(numerator))),
+		                      ClojureBigInteger.reduceBigInt(ClojureBigInteger.fromBigInteger(new BigInteger(m.group(2)))));
 		}
 	return null;
 }
@@ -703,7 +706,7 @@ public static class FnReader extends AFn{
 			throw new IllegalStateException("Nested #()s are not allowed");
 		try
 			{
-			Var.pushThreadBindings(
+			Variable.pushThreadBindings(
 					RT.map(ARG_ENV, PersistentTreeMap.EMPTY));
 			unread(r, '(');
 			Object form = read(r, true, null, true, opts, ensurePending(pendingForms));
@@ -735,7 +738,7 @@ public static class FnReader extends AFn{
 			}
 		finally
 			{
-			Var.popThreadBindings();
+			Variable.popThreadBindings();
 			}
 	}
 }
@@ -814,7 +817,7 @@ public static class MetaReader extends AFn{
 			IMapEntry kv = (IMapEntry) s.first();
 			ometa = RT.assoc(ometa, kv.getKey(), kv.getValue());
 			}
-			return ((IObj) o).withMeta((IPersistentMap) ometa);
+			return ((IClojureObject) o).withMeta((IPersistentMap) ometa);
 			}
 		else
 			throw new IllegalArgumentException("Metadata can only be applied to IMetas");
@@ -827,7 +830,7 @@ public static class SyntaxQuoteReader extends AFn{
 		PushbackReader r = (PushbackReader) reader;
 		try
 			{
-			Var.pushThreadBindings(
+			Variable.pushThreadBindings(
 					RT.map(GENSYM_ENV, PersistentHashMap.EMPTY));
 
 			Object form = read(r, true, null, true, opts, ensurePending(pendingForms));
@@ -835,7 +838,7 @@ public static class SyntaxQuoteReader extends AFn{
 			}
 		finally
 			{
-			Var.popThreadBindings();
+			Variable.popThreadBindings();
 			}
 	}
 
@@ -925,12 +928,12 @@ public static class SyntaxQuoteReader extends AFn{
 		else
 			ret = RT.list(Compiler.QUOTE, form);
 
-		if(form instanceof IObj && RT.meta(form) != null)
+		if(form instanceof IClojureObject && RT.meta(form) != null)
 			{
 			//filter line and column numbers
-			IPersistentMap newMeta = ((IObj) form).meta().without(RT.LINE_KEY).without(RT.COLUMN_KEY);
+			IPersistentMap newMeta = ((IClojureObject) form).getMeta().without(RT.LINE_KEY).without(RT.COLUMN_KEY);
 			if(newMeta.count() > 0)
-				return RT.list(WITH_META, ret, syntaxQuote(((IObj) form).meta()));
+				return RT.list(WITH_META, ret, syntaxQuote(((IClojureObject) form).getMeta()));
 			}
 		return ret;
 	}
@@ -1049,7 +1052,7 @@ public static class ListReader extends AFn{
 		List list = readDelimitedList(')', r, true, opts, ensurePending(pendingForms));
 		if(list.isEmpty())
 			return PersistentList.EMPTY;
-		IObj s = (IObj) PersistentList.create(list);
+		IClojureObject s = (IClojureObject) PersistentList.create(list);
 //		IObj s = (IObj) RT.seq(list);
 		if(line != -1)
 			{
@@ -1125,7 +1128,7 @@ public static class EvalReader extends AFn{
 				return Reflector.invokeStaticMethod(fs.ns, fs.name, args);
 				}
 			Object v = Compiler.maybeResolveIn(Compiler.currentNS(), fs);
-			if(v instanceof Var)
+			if(v instanceof Variable)
 				{
 				return ((IFn) v).applyTo(RT.next(o));
 				}
@@ -1381,7 +1384,7 @@ public static class ConditionalReader extends AFn {
 
 			// When we already have a result, or when the feature didn't match, discard the next form in the reader
 			try {
-				Var.pushThreadBindings(RT.map(RT.SUPPRESS_READ, RT.T));
+				Variable.pushThreadBindings(RT.map(RT.SUPPRESS_READ, RT.T));
 				form = read(r, false, READ_EOF, ')', READ_FINISHED, true, opts, pendingForms);
 
 				if (form == READ_EOF) {
@@ -1394,7 +1397,7 @@ public static class ConditionalReader extends AFn {
 				}
 			}
 			finally {
-				Var.popThreadBindings();
+				Variable.popThreadBindings();
 			}
 
 		}
@@ -1449,7 +1452,7 @@ public static class ConditionalReader extends AFn {
 			throw Util.runtimeException("read-cond body must be a list");
 
 		try {
-			Var.pushThreadBindings(RT.map(READ_COND_ENV, RT.T));
+			Variable.pushThreadBindings(RT.map(READ_COND_ENV, RT.T));
 
 			if (isPreserveReadCond(opts)) {
 				IFn listReader = getMacro(ch); // should always be a list
@@ -1460,7 +1463,7 @@ public static class ConditionalReader extends AFn {
 				return readCondDelimited(r, splicing, opts, pendingForms);
 			}
 		} finally {
-			Var.popThreadBindings();
+			Variable.popThreadBindings();
 		}
 	}
 }

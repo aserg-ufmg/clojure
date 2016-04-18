@@ -13,6 +13,7 @@ package clojure.lang;
 import java.util.Map;
 
 import clojure.lang.PersistentHashMap.INode;
+import clojure.lang.interfaces.ISeq;
 
 public abstract class ATransientMap extends AFn implements ITransientMap {
 	abstract void ensureEditable();

@@ -15,6 +15,9 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 /**
  * Implements the special common case of a finite range based on long start, end, and step.
  */
@@ -103,7 +106,7 @@ public static ISeq create(final long start, long end, long step) {
     }
 }
 
-public Obj withMeta(IPersistentMap meta){
+public ClojureObject withMeta(IPersistentMap meta){
     if(meta == _meta)
         return this;
     return new LongRange(meta, start, end, step, boundsCheck, _chunk, _chunkNext);

@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.util.Enumeration;
 
+import clojure.lang.interfaces.ISeq;
+
 public class EnumerationSeq extends ASeq{
 final Enumeration iter;
 final State state;

@@ -12,6 +12,8 @@
 
 package clojure.lang;
 
+import clojure.lang.interfaces.IFn;
+
 public interface IKVReduce{
 Object kvreduce(IFn f, Object init);
 }

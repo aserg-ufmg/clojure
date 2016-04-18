@@ -13,6 +13,9 @@ package clojure.lang;
 import java.io.Serializable;
 import java.util.*;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 /**
  * Implements generic numeric (potentially infinite) range.
  */
@@ -96,7 +99,7 @@ public static ISeq create(final Object start, Object end, Object step) {
     return new Range(start, end, step, Numbers.isPos(step)?positiveStep(end):negativeStep(end));
 }
 
-public Obj withMeta(IPersistentMap meta){
+public ClojureObject withMeta(IPersistentMap meta){
 	if(meta == _meta)
 		return this;
 	return new Range(meta, end, start, step, boundsCheck, _chunk, _chunkNext);

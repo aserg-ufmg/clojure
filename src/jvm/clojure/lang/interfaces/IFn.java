@@ -10,7 +10,7 @@
 
 /* rich Mar 25, 2006 3:54:03 PM */
 
-package clojure.lang;
+package clojure.lang.interfaces;
 
 import java.util.concurrent.Callable;
 

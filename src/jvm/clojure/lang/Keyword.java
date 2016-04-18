@@ -17,6 +17,10 @@ import java.io.Serializable;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ConcurrentHashMap;
+
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 
@@ -35,7 +39,7 @@ public static Keyword intern(Symbol sym){
 	if(existingRef == null)
 		{
 		Util.clearCache(rq, table);
-		if(sym.meta() != null)
+		if(sym.getMeta() != null)
 			sym = (Symbol) sym.withMeta(null);
 		k = new Keyword(sym);
 		existingRef = table.putIfAbsent(sym, new WeakReference<Keyword>(k, rq));

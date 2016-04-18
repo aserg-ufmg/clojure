@@ -9,6 +9,8 @@
  **/
 package clojure.lang;
 
+import clojure.lang.interfaces.ISeq;
+
 public abstract class RestFn extends AFunction{
 abstract public int getRequiredArity();
 

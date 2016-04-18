@@ -16,6 +16,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 /**
  * Simple implementation of persistent map on an array
  * <p/>
@@ -27,7 +30,7 @@ import java.util.NoSuchElementException;
  * null keys and values are ok, but you won't be able to distinguish a null value via valAt - use contains/entryAt
  */
 
-public class PersistentArrayMap extends APersistentMap implements IObj, IEditableCollection, IMapIterable, IKVReduce{
+public class PersistentArrayMap extends APersistentMap implements IClojureObject, IEditableCollection, IMapIterable, IKVReduce{
 
 final Object[] array;
 static final int HASHTABLE_THRESHOLD = 16;
@@ -55,11 +58,11 @@ public PersistentArrayMap withMeta(IPersistentMap meta){
 }
 
 PersistentArrayMap create(Object... init){
-	return new PersistentArrayMap(meta(), init);
+	return new PersistentArrayMap(getMeta(), init);
 }
 
 IPersistentMap createHT(Object[] init){
-	return PersistentHashMap.create(meta(), init);
+	return PersistentHashMap.create(getMeta(), init);
 }
 
 static public PersistentArrayMap createWithCheck(Object[] init){
@@ -228,7 +231,7 @@ public IPersistentMap without(Object key){
 }
 
 public IPersistentMap empty(){
-	return (IPersistentMap) EMPTY.withMeta(meta());
+	return (IPersistentMap) EMPTY.withMeta(getMeta());
 }
 
 final public Object valAt(Object key, Object notFound){
@@ -294,7 +297,7 @@ public ISeq seq(){
 	return null;
 }
 
-public IPersistentMap meta(){
+public IPersistentMap getMeta(){
 	return _meta;
 }
 
@@ -327,7 +330,7 @@ static class Seq extends ASeq implements Counted{
 		return (array.length - i) / 2;
 	}
 
-	public Obj withMeta(IPersistentMap meta){
+	public ClojureObject withMeta(IPersistentMap meta){
 		return new Seq(meta, array, i);
 	}
 }

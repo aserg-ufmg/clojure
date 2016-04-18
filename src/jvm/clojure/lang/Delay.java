@@ -12,6 +12,8 @@
 
 package clojure.lang;
 
+import clojure.lang.interfaces.IFn;
+
 public class Delay implements IDeref, IPending{
 Object val;
 Throwable exception;
@@ -49,5 +51,9 @@ synchronized public Object deref() {
 
 synchronized public boolean isRealized(){
 	return fn == null;
+}
+
+Object reset(Object newval) {
+	return null;
 }
 }

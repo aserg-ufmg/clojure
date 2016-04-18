@@ -8,7 +8,28 @@
  *   You must not remove this notice, or any other, from this software.
  **/
 
+/* rich Mar 25, 2006 3:44:58 PM */
+
 package clojure.lang;
 
-public interface IType {
+import java.io.Serializable;
+
+public abstract class ClojureObject implements IClojureObject, Serializable {
+
+final IPersistentMap _meta;
+
+public ClojureObject(IPersistentMap meta){
+	this._meta = meta;
+}
+
+public ClojureObject(){
+	_meta = null;
+}
+
+final public IPersistentMap getMeta(){
+	return _meta;
+}
+
+abstract public ClojureObject withMeta(IPersistentMap meta);
+
 }

@@ -12,6 +12,9 @@
 
 package clojure.lang;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
 public interface IReference extends IMeta {
     IPersistentMap alterMeta(IFn alter, ISeq args) ;
     IPersistentMap resetMeta(IPersistentMap m);

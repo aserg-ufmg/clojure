@@ -15,6 +15,8 @@ package clojure.lang;
 import java.util.Collection;
 import java.util.RandomAccess;
 
+import clojure.lang.interfaces.ISeq;
+
 public class LazilyPersistentVector{
 
 

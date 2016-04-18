@@ -15,25 +15,27 @@ package clojure.lang;
 import java.io.Serializable;
 import java.util.Comparator;
 
-public abstract class AFunction extends AFn implements IObj, Comparator, Fn, Serializable {
+import clojure.lang.interfaces.ISeq;
+
+public abstract class AFunction extends AFn implements IClojureObject, Comparator, Fn, Serializable {
 
 public volatile MethodImplCache __methodImplCache;
 
-public IPersistentMap meta(){
+public IPersistentMap getMeta(){
 	return null;
 }
 
-public IObj withMeta(final IPersistentMap meta){
+public IClojureObject withMeta(final IPersistentMap meta){
 	return new RestFn(){
 		protected Object doInvoke(Object args) {
 			return AFunction.this.applyTo((ISeq) args);
 		}
 
-		public IPersistentMap meta(){
+		public IPersistentMap getMeta(){
 			return meta;
 		}
 
-		public IObj withMeta(IPersistentMap meta){
+		public IClojureObject withMeta(IPersistentMap meta){
 			return AFunction.this.withMeta(meta);
 		}
 

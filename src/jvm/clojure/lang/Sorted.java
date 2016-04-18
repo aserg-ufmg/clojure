@@ -14,6 +14,8 @@ package clojure.lang;
 
 import java.util.Comparator;
 
+import clojure.lang.interfaces.ISeq;
+
 public interface Sorted{
 Comparator comparator();
 

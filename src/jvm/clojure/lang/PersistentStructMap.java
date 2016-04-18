@@ -17,7 +17,10 @@ import java.util.Map;
 import java.io.Serializable;
 import java.util.NoSuchElementException;
 
-public class PersistentStructMap extends APersistentMap implements IObj{
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.ISeq;
+
+public class PersistentStructMap extends APersistentMap implements IClojureObject{
 
 public static class Def implements Serializable{
 	final ISeq keys;
@@ -114,13 +117,13 @@ protected PersistentStructMap makeNew(IPersistentMap meta, Def def, Object[] val
 	return new PersistentStructMap(meta, def, vals, ext);
 }
 
-public IObj withMeta(IPersistentMap meta){
+public IClojureObject withMeta(IPersistentMap meta){
 	if(meta == _meta)
 		return this;
 	return makeNew(meta, def, vals, ext);
 }
 
-public IPersistentMap meta(){
+public IPersistentMap getMeta(){
 	return _meta;
 }
 
@@ -238,7 +241,7 @@ static class Seq extends ASeq{
 		this.ext = ext;
 	}
 
-	public Obj withMeta(IPersistentMap meta){
+	public ClojureObject withMeta(IPersistentMap meta){
 		if(meta != _meta)
 			return new Seq(meta, keys, vals, i, ext);
 		return this;

@@ -242,7 +242,7 @@ public class Attribute {
      * @param out
      *            where the attributes must be written.
      */
-    final void put(final ClassWriter cw, final byte[] code, final int len,
+    final void writeAllAtributes(final ClassWriter cw, final byte[] code, final int len,
             final int maxStack, final int maxLocals, final ByteVector out) {
         Attribute attr = this;
         while (attr != null) {

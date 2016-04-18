@@ -267,7 +267,7 @@ final class FieldWriter extends FieldVisitor {
             ianns.put(out);
         }
         if (attrs != null) {
-            attrs.put(cw, null, 0, -1, -1, out);
+            attrs.writeAllAtributes(cw, null, 0, -1, -1, out);
         }
     }
 }

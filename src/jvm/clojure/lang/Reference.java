@@ -16,8 +16,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class Ref extends ARef implements IFn, Comparable<Ref>, IRef{
-    public int compareTo(Ref ref) {
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.IRef;
+import clojure.lang.interfaces.ISeq;
+
+public class Reference extends ARef implements IFn, Comparable<Reference>, IRef{
+    public int compareTo(Reference ref) {
         if(this.id == ref.id)
             return 0;
         else if(this.id < ref.id)
@@ -30,7 +34,7 @@ public int getMinHistory(){
 	return minHistory;
 }
 
-public Ref setMinHistory(int minHistory){
+public Reference setMinHistory(int minHistory){
 	this.minHistory = minHistory;
 	return this;
 }
@@ -39,7 +43,7 @@ public int getMaxHistory(){
 	return maxHistory;
 }
 
-public Ref setMaxHistory(int maxHistory){
+public Reference setMaxHistory(int maxHistory){
 	this.maxHistory = maxHistory;
 	return this;
 }
@@ -80,11 +84,11 @@ volatile int maxHistory = 10;
 
 static final AtomicLong ids = new AtomicLong();
 
-public Ref(Object initVal) {
+public Reference(Object initVal) {
 	this(initVal, null);
 }
 
-public Ref(Object initVal,IPersistentMap meta) {
+public Reference(Object initVal,IPersistentMap meta) {
     super(meta);
     this.id = ids.getAndIncrement();
 	this.faults = new AtomicInteger();

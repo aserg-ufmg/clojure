@@ -10,7 +10,9 @@
 
 /* rich Feb 27, 2008 */
 
-package clojure.lang;
+package clojure.lang.interfaces;
+
+import clojure.lang.IPersistentMap;
 
 public interface IProxy{
 

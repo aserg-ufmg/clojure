@@ -16,7 +16,7 @@ import java.io.Serializable;
 import java.io.ObjectStreamException;
 
 
-public class Symbol extends AFn implements IObj, Comparable, Named, Serializable, IHashEq{
+public class Symbol extends AFn implements IClojureObject, Comparable, Named, Serializable, IHashEq{
 final String ns;
 final String name;
 private int _hasheq;
@@ -91,7 +91,7 @@ public int hasheq() {
 	return _hasheq;
 }
 
-public IObj withMeta(IPersistentMap meta){
+public IClojureObject withMeta(IPersistentMap meta){
 	return new Symbol(meta, ns, name);
 }
 
@@ -130,7 +130,16 @@ public Object invoke(Object obj, Object notFound) {
 	return RT.get(obj, this, notFound);
 }
 
-public IPersistentMap meta(){
+public IPersistentMap getMeta(){
 	return _meta;
+}
+
+public static Variable find(Symbol nsQualifiedSym){
+	if(nsQualifiedSym.ns == null)
+		throw new IllegalArgumentException("Symbol must be namespace-qualified");
+	Namespace ns = Namespace.find(intern(nsQualifiedSym.ns));
+	if(ns == null)
+		throw new IllegalArgumentException("No such namespace: " + nsQualifiedSym.ns);
+	return ns.findInternedVar(intern(nsQualifiedSym.name));
 }
 }

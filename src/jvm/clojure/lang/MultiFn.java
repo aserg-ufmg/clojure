@@ -15,6 +15,10 @@ package clojure.lang;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import clojure.lang.interfaces.IFn;
+import clojure.lang.interfaces.IRef;
+import clojure.lang.interfaces.ISeq;
+
 public class MultiFn extends AFn{
 final public IFn dispatchFn;
 final public Object defaultDispatchVal;
@@ -26,10 +30,10 @@ volatile IPersistentMap preferTable;
 volatile IPersistentMap methodCache;
 volatile Object cachedHierarchy;
 
-static final Var assoc = RT.var("clojure.core", "assoc");
-static final Var dissoc = RT.var("clojure.core", "dissoc");
-static final Var isa = RT.var("clojure.core", "isa?");
-static final Var parents = RT.var("clojure.core", "parents");
+static final Variable assoc = RT.var("clojure.core", "assoc");
+static final Variable dissoc = RT.var("clojure.core", "dissoc");
+static final Variable isa = RT.var("clojure.core", "isa?");
+static final Variable parents = RT.var("clojure.core", "parents");
 
 public MultiFn(String name, IFn dispatchFn, Object defaultDispatchVal, IRef hierarchy) {
 	this.rw = new ReentrantReadWriteLock();
@@ -119,12 +123,8 @@ private boolean prefers(Object x, Object y) {
 	return false;
 }
 
-private boolean isA(Object x, Object y) {
-    return RT.booleanCast(isa.invoke(hierarchy.deref(), x, y));
-}
-
 private boolean dominates(Object x, Object y) {
-	return prefers(x, y) || isA(x, y);
+	return prefers(x, y) || RT.booleanCast(isa.invoke(hierarchy.deref(), x, y));
 }
 
 private IPersistentMap resetCache() {
@@ -170,7 +170,7 @@ private IFn findAndCacheBestMethod(Object dispatchVal) {
 		for(Object o : getMethodTable())
 			{
 			Map.Entry e = (Map.Entry) o;
-			if(isA(dispatchVal, e.getKey()))
+			if(RT.booleanCast(isa.invoke(hierarchy.deref(), dispatchVal, e.getKey())))
 				{
 				if(bestEntry == null || dominates(e.getKey(), bestEntry.getKey()))
 					bestEntry = e;

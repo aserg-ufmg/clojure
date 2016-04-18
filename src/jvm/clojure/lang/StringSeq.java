@@ -12,6 +12,8 @@
 
 package clojure.lang;
 
+import clojure.lang.interfaces.ISeq;
+
 public class StringSeq extends ASeq implements IndexedSeq{
 public final CharSequence s;
 public final int i;
@@ -28,8 +30,8 @@ StringSeq(IPersistentMap meta, CharSequence s, int i){
 	this.i = i;
 }
 
-public Obj withMeta(IPersistentMap meta){
-	if(meta == meta())
+public ClojureObject withMeta(IPersistentMap meta){
+	if(meta == getMeta())
 		return this;
 	return new StringSeq(meta, s, i);
 }

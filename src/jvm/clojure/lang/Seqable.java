@@ -12,6 +12,8 @@
 
 package clojure.lang;
 
+import clojure.lang.interfaces.ISeq;
+
 public interface Seqable {
     ISeq seq();
 }

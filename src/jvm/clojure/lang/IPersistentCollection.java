@@ -19,5 +19,5 @@ IPersistentCollection cons(Object o);
 
 IPersistentCollection empty();
 
-boolean equiv(Object o);
+boolean isEquivalent(Object o);
 }

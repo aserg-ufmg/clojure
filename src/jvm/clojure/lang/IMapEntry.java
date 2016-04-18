@@ -16,4 +16,6 @@ public interface IMapEntry extends Map.Entry{
 Object key();
 
 Object val();
+
+Object nth(int i);
 }

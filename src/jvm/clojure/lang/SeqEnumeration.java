@@ -14,6 +14,8 @@ package clojure.lang;
 
 import java.util.Enumeration;
 
+import clojure.lang.interfaces.ISeq;
+
 public class SeqEnumeration implements Enumeration{
 ISeq seq;
 
